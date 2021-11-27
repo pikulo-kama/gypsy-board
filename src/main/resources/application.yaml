@@ -1,0 +1,6 @@
+spring:
+  datasource:
+    url: ${GYPSY_BOARD_POSTGRES_URL:jdbc:postgresql://localhost:5435/gypsyboard}
+    username: ${GYPSY_BOARD_POSTGRES_USER:admin}
+    password: ${GYPSY_BOARD_POSTGRES_PASS:admin}
+    driver-class-name: org.postgresql.Driver
