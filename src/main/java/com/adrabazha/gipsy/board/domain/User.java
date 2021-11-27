@@ -22,9 +22,9 @@ public class User {
     @GeneratedValue
     private Long id;
 
-    private String firstName;
+    private String username;
 
-    private String lastName;
+    private String fullName;
 
     private String password;
 }
