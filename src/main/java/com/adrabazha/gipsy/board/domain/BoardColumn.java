@@ -5,12 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.List;
 
 @Builder
@@ -18,20 +13,22 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Column {
+@Table(name = Tables.BOARD_COLUMN)
+public class BoardColumn {
 
     @Id
+    @Column(name = PrimaryKeys.BOARD_COLUMN)
     @GeneratedValue
-    private Long id;
+    private Long columnId;
 
     private String columnName;
 
     private Integer columnOrder;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "board_id")
     private Board board;
 
-    @OneToMany(mappedBy = "column")
+    @OneToMany(mappedBy = "boardColumn", fetch = FetchType.EAGER)
     private List<Task> tasks;
 }

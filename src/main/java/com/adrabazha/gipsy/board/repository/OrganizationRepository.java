@@ -6,5 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface OrganizationRepository extends JpaRepository<Organization, Long> {
-    List<Organization> getOrganizationsByOrganizationNameContains(String organizationName);
+    List<Organization> findOrganizationsByOrganizationNameContains(String organizationName);
+
+
 }
