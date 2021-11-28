@@ -5,13 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 import java.util.Date;
 
 @Builder
@@ -19,11 +13,13 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Table(name = Tables.COMMENT)
 public class Comment {
 
     @Id
+    @Column(name = PrimaryKeys.COMMENT)
     @GeneratedValue
-    private Long id;
+    private Long commentId;
 
     @ManyToOne
     @JoinColumn(name = "task_id")
