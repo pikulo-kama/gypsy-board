@@ -1,0 +1,24 @@
+.user-image-container {
+
+}
+
+.user-image {
+    width: 8vw;
+    height: 8vh;
+}
+
+.user-full-name {
+    bottom: -5vh;
+    z-index: 99999;
+    color: var(--sub-color);
+    background: var(--third-color);
+    border-radius: 6px;
+    font-size: 11px;
+    padding: 3px;
+    visibility: hidden;
+}
+
+.user-image:hover + .user-full-name {
+    visibility: visible;
+}
+

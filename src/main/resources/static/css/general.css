@@ -1,0 +1,208 @@
+:root {
+    --main-color: #B4C6A6/*7CE7CA*/;
+    --sub-color: #66806A/*134744*/;
+    --third-color: #FFC286/*e5cf2f*/;
+    --forth-color: #FFF1AF;
+    --color-red: #ec1840;
+    --color-purple: #7a18ec;
+    --color-white: #fff;
+    --color-black-1: #111;
+    --color-black-2: #222;
+    --color-black-3: #444;
+    --speed-normal: 0.5s;
+    --speed-fast: 0.8s;
+}
+
+body {
+    background-color: var(--main-color);
+    color: #f7f7f7;
+}
+
+.app-button {
+    flex: 1 1 auto;
+    margin: 10px;
+    padding: 10px;
+    background-color: transparent;
+    border: 2px solid #f7f7f7;
+    text-align: center;
+    text-transform: uppercase;
+    position: relative;
+    overflow: hidden;
+    transition: .3s;
+}
+
+.app-button:after {
+    position: absolute;
+    transition: 0.3s;
+    content: "";
+    width: 0;
+    bottom: 0;
+    background: var(--sub-color);
+    height: 120%;
+    left: -10%;
+    transform: skewX(15deg);
+    z-index: -1;
+}
+
+.app-button:hover {
+    cursor: pointer;
+    color: var(--main-color);
+}
+
+.app-button:hover:after {
+    left: -10%;
+    width: 120%;
+}
+
+.gradient-text {
+    background: linear-gradient(52deg, var(--sub-color), var(--main-color), var(--third-color));
+    background-size: 400% 400%;
+    color: #000;
+    -webkit-text-fill-color: transparent;
+    -webkit-background-clip: text;
+
+    -webkit-animation: gradient-header-animation 9s ease infinite;
+    -moz-animation: gradient-header-animation 9s ease infinite;
+    animation: gradient-header-animation 9s ease infinite;
+}
+
+.gradient-background {
+    background: linear-gradient(52deg, var(--sub-color), var(--main-color), var(--third-color));
+    border-radius: 8px;
+    -webkit-animation: gradient-header-animation 9s ease infinite;
+    -moz-animation: gradient-header-animation 9s ease infinite;
+    animation: gradient-header-animation 9s ease infinite;
+}
+
+.gradient-background-size-600 {
+    background-size: 600% 600%;
+}
+
+@-webkit-keyframes gradient-header-animation {
+    0%{background-position:0% 60%}
+    50%{background-position:100% 41%}
+    100%{background-position:0% 60%}
+}
+@-moz-keyframes gradient-header-animation {
+    0%{background-position:0% 60%}
+    50%{background-position:100% 41%}
+    100%{background-position:0% 60%}
+}
+@keyframes gradient-header-animation {
+    0%{background-position:0% 60%}
+    50%{background-position:100% 41%}
+    100%{background-position:0% 60%}
+}
+
+.bg-main {
+    background: var(--main-color);
+}
+
+.fg-main {
+    color: var(--main-color);
+}
+
+.bg-sub {
+    background: var(--sub-color);
+}
+
+.fg-sub {
+    color: var(--sub-color);
+}
+
+.bg-third {
+    background: var(--third-color);
+}
+
+.fg-third {
+    color: var(--third-color);
+}
+
+.bg-forth {
+    background: var(--forth-color);
+}
+
+.fg-forth {
+    color: var(--forth-color);
+}
+
+.hover-fg-main:hover {
+    color: var(--main-color);
+}
+
+.hover-fg-sub:hover {
+    color: var(--sub-color);
+}
+
+.hover-fg-third:hover {
+    color: var(--third-color);
+}
+
+.hover-fg-forth:hover {
+    color: var(--forth-color);
+}
+
+.scrollbar {
+    overflow: hidden;
+    margin-bottom: 25px;
+}
+
+.scrollbar-x {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 25px;
+}
+
+.scrollbar-y {
+    height: 100%;
+    overflow-y: auto;
+}
+
+.force-overflow {
+    max-height: 40vh;
+}
+
+html::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
+    background-color: #F5F5F5;
+    border-radius: 10px;
+}
+
+html::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+    background-color: #F5F5F5;
+}
+
+html::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
+    background-image: -webkit-gradient(linear, left bottom, left top, from(#a8edea), to(#fed6e3));
+    background-image: -webkit-linear-gradient(bottom, #a8edea 0%, #fed6e3 100%);
+    background-image: linear-gradient(to top, #a8edea 0%, #fed6e3 100%);
+}
+
+.scrollbar-rare-wind::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
+    background-image: -webkit-gradient(linear, left bottom, left top, from(#a8edea), to(#fed6e3));;
+    border-radius: 10px;
+}
+
+.scrollbar-rare-wind::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+    border-radius: 10px;
+    background-image: -webkit-gradient(linear, left bottom, left top, from(#a8edea), to(#fed6e3));;
+}
+
+.scrollbar-rare-wind::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
+    background-image: -webkit-gradient(linear, left bottom, left top, from(#a8edea), to(#fed6e3));
+    background-image: -webkit-linear-gradient(bottom, #a8edea 0%, #fed6e3 100%);
+    background-image: linear-gradient(to top, #a8edea 0%, #fed6e3 100%);
+}
+
+.scrollbar-rare-wind {
+    scrollbar-color: #a8edea #F5F5F5;
+}
