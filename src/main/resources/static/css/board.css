@@ -1,0 +1,29 @@
+.board-container {
+    width: 70%;
+    height: 70%;
+    background: var(--sub-color);
+    border-radius: 5px;
+}
+
+.board-column {
+    width: 20%;
+    min-width: 20%;
+    max-height: 70vh;
+    margin-left: 1vw;
+    margin-right: 1vw;
+    padding: 1vw;
+    border-radius: 5px;
+    background: var(--third-color);
+    color: var(--sub-color);
+}
+
+.board-tasks-container a {
+    text-decoration: none;
+    color: var(--sub-color);
+}
+
+.anchor-disabled {
+    pointer-events: none;
+    opacity: 0.5;
+}
+

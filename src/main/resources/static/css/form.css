@@ -1,0 +1,12 @@
+.form-container {
+    background-color: var(--main-color);
+    backdrop-filter: blur(5px);
+    align-items: center;
+    padding: 2vh 2vh;
+}
+
+.form-text {
+    margin-top: 2vh;
+    margin-bottom: 2vh;
+    border-radius: 8px;
+}
