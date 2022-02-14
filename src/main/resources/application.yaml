@@ -12,6 +12,19 @@ spring:
       static-locations: classpath:/static
   cache:
     type: "none"
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: noreply.gypsy.board@gmail.com
+    password: H@ck3r00
+    protocol: smtp
+    properties.mail.smtp:
+      auth: true
+      starttls.enable: true
 
 server:
   port: 8000
+
+application:
+  token:
+    lifetime: 24

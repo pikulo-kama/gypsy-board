@@ -13,4 +13,6 @@ public interface PrimaryKeys {
     String TASK = "task_id";
 
     String COMMENT = "comment_id";
+
+    String REGISTRATION_TOKEN = "registration_token_id";
 }

@@ -1,0 +1,1 @@
+ALTER TABLE "registration_tokens" ALTER COLUMN expiry_date TYPE TIMESTAMP;
