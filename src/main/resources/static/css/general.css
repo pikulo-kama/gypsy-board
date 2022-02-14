@@ -95,51 +95,51 @@ body {
 }
 
 .bg-main {
-    background: var(--main-color);
+    background: var(--main-color)!important;
 }
 
 .fg-main {
-    color: var(--main-color);
+    color: var(--main-color)!important;
 }
 
 .bg-sub {
-    background: var(--sub-color);
+    background: var(--sub-color)!important;
 }
 
 .fg-sub {
-    color: var(--sub-color);
+    color: var(--sub-color)!important;
 }
 
 .bg-third {
-    background: var(--third-color);
+    background: var(--third-color)!important;
 }
 
 .fg-third {
-    color: var(--third-color);
+    color: var(--third-color)!important;
 }
 
 .bg-forth {
-    background: var(--forth-color);
+    background: var(--forth-color)!important;
 }
 
 .fg-forth {
-    color: var(--forth-color);
+    color: var(--forth-color)!important;
 }
 
 .hover-fg-main:hover {
-    color: var(--main-color);
+    color: var(--main-color)!important;
 }
 
 .hover-fg-sub:hover {
-    color: var(--sub-color);
+    color: var(--sub-color)!important;
 }
 
 .hover-fg-third:hover {
-    color: var(--third-color);
+    color: var(--third-color)!important;
 }
 
 .hover-fg-forth:hover {
-    color: var(--forth-color);
+    color: var(--forth-color)!important;
 }
 
 .scrollbar {

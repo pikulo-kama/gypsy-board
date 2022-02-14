@@ -1,54 +1,55 @@
-<#include "../includes/header.ftl" >
+<#include "../includes/header.ftl">
+<div class="d-flex flex-column mt-5 align-items-center text-center">
+    <p class="display-4 text-uppercase">Registration</p>
+    <form method="POST" action="/auth/register-user">
 
-<div class="back"></div>
-<div class="registration-form">
-    <header>
-        <h1>Sign Up</h1>
-        <p>Input you information</p>
-    </header>
-    <form action="/auth/register-user" method="POST">
-        <div class="input-section username-section">
-            <input class="username" name="username" type="text" placeholder="ENTER YOUR USERNAME HERE" autocomplete="off"/>
-            <div class="animated-button"><span class="icon-paper-plane"><i class="fa fa-envelope-o">
-                    </i></span><span class="next-button username"><i class="fa fa-arrow-up"></i></span>
+        <#--    Username    -->
+        <div class="form-outline mb-4">
+            <input required name="username" type="text" id="username-address-field" class="form-control bg-third" />
+            <label class="form-label" for="username-address-field">Username</label>
+        </div>
+
+        <!-- Email input -->
+        <div class="form-outline mb-4">
+            <input required name="email" type="email" id="email-address-field" class="form-control bg-third" />
+            <label class="form-label" for="email-address-field">Email address</label>
+        </div>
+
+        <!-- 2 column grid layout with text inputs for the first and last names -->
+        <div class="row mb-4">
+            <div class="col">
+                <div class="form-outline">
+                    <input required name="firstName" type="text" id="first-name-field" class="form-control bg-third" />
+                    <label class="form-label" for="first-name-field">First name</label>
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-outline">
+                    <input required name="lastName" type="text" id="last-name-field" class="form-control bg-third" />
+                    <label class="form-label" for="last-name-field">Last name</label>
+                </div>
             </div>
         </div>
-        <div class="input-section first-name-section folded">
-            <input class="first-name" name="firstName" type="text" placeholder="ENTER YOUR FIRST NAME HERE" autocomplete="off"/>
-            <div class="animated-button"><span class="icon-paper-plane"><i class="fa fa-envelope-o">
-                    </i></span><span class="next-button first-name"><i class="fa fa-arrow-up"></i></span>
+
+        <!-- Password and confirmation -->
+        <div class="row mb-4">
+            <div class="col">
+                <div class="form-outline">
+                    <input required name="password" type="password" id="password-field" class="form-control bg-third" />
+                    <label class="form-label" for="password-field">Password</label>
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-outline">
+                    <input required name="passwordRepeat" type="password" id="password-repeat-field" class="form-control bg-third" />
+                    <label class="form-label" for="password-repeat-field">Confirmation</label>
+                </div>
             </div>
         </div>
-        <div class="input-section last-name-section folded">
-            <input class="last-name" name="lastName" type="text" placeholder="ENTER YOUR LAST NAME HERE" autocomplete="off"/>
-            <div class="animated-button"><span class="icon-paper-plane"><i class="fa fa-envelope-o">
-                    </i></span><span class="next-button last-name"><i class="fa fa-arrow-up"></i></span>
-            </div>
-        </div>
-        <div class="input-section password-section folded">
-            <input class="password" name="password" type="password" placeholder="ENTER YOUR PASSWORD HERE"/>
-            <div class="animated-button"><span class="icon-lock">
-                    <i class="fa fa-lock"></i></span><span class="next-button password">
-                    <i class="fa fa-arrow-up"></i></span>
-            </div>
-        </div>
-        <div class="input-section repeat-password-section folded">
-            <input class="repeat-password" name="passwordRepeat" type="password" placeholder="REPEAT YOUR PASSWORD HERE"/>
-            <div class="animated-button"><span class="icon-repeat-lock">
-                    <i class="fa fa-lock"></i></span><span class="next-button repeat-password">
-                    <i class="fa fa-paper-plane"></i></span>
-            </div>
-        </div>
+
+        <!-- Submit button -->
         <input name="${(_csrf.parameterName)!}" value="${(_csrf.token)!}" type="hidden" />
-        <button type="submit" class="app-button register-user-button" style="display: none;"></button>
-        <div class="success">
-            <p>ACCOUNT CREATED</p>
-        </div>
+        <button type="submit" class="btn btn-primary btn-block mb-4 bg-sub">Sign up</button>
     </form>
 </div>
-
-<link rel="stylesheet" href="/css/register.css">
-<script type="text/javascript" src="/scripts/register.js"></script>
-
-<#include "../includes/footer.ftl" >
-
+<#include "../includes/footer.ftl">

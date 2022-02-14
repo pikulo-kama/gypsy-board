@@ -13,4 +13,6 @@ public interface Tables {
     String TASK = "tasks";
     
     String COMMENT = "comments";
+
+    String REGISTRATION_TOKEN = "registration_tokens";
 }

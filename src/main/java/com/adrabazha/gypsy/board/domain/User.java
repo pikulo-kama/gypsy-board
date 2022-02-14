@@ -42,11 +42,16 @@ public class User implements UserDetails {
     @NotNull
     private String username;
 
+    private String email;
+
     @NotNull
     private String fullName;
 
     @NotNull
     private String password;
+
+    @Column(name = "enabled")
+    private Boolean isEnabled;
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(name = "user_organization",
@@ -76,7 +81,7 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return isEnabled;
     }
 }
 
