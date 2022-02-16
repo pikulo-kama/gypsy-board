@@ -1,4 +1,5 @@
-CREATE OR REPLACE FUNCTION initialize_test_data() returns void as $body$
+CREATE OR REPLACE FUNCTION initialize_test_data() returns void as
+$body$
 DECLARE
     organizationId bigint;
     boardId        bigint;
@@ -14,12 +15,13 @@ BEGIN
     WHERE organization_name = 'Top Organization';
 
     -- Credentials: admin/admin
-    INSERT INTO "users" (username, full_name, "password")
-    VALUES ('admin', 'ADMIN', '$2a$10$lTP2KTWeIiaqUXm6Hlw5Hex7bz.NJpSBZ43Yb8764qbqNCFA9v1M2');
+    INSERT INTO "users" (username, full_name, "password", "email", enabled)
+    VALUES ('admin', 'ADMIN', '$2a$10$lTP2KTWeIiaqUXm6Hlw5Hex7bz.NJpSBZ43Yb8764qbqNCFA9v1M2', 'admin@test.com', true);
 
     SELECT user_id INTO userId FROM "users" WHERE username = 'admin';
 
-    INSERT INTO "user_organization" (user_id, organization_id) VALUES (userId, organizationId);
+    INSERT INTO "user_organization" (user_id, organization_id, role_id)
+    VALUES (userId, organizationId, (select role_id from user_roles where role_code = 'administrator'));
 
     INSERT INTO "boards" (board_name, organization_id)
     VALUES ('Test Board', organizationId);
@@ -45,5 +47,5 @@ BEGIN
            ('Secondary Task #3', 30, columnId, userId, 'text');
 END ;
 $body$
-LANGUAGE PLPGSQL
-SECURITY DEFINER;
+    LANGUAGE PLPGSQL
+    SECURITY DEFINER;

@@ -10,6 +10,8 @@ public interface PrimaryKeys {
 
     String ORGANIZATION = "organization_id";
 
+    String ORGANIZATION_ROLE = "role_id";
+
     String TASK = "task_id";
 
     String COMMENT = "comment_id";

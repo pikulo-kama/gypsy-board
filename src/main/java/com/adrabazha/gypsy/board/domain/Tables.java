@@ -6,6 +6,8 @@ public interface Tables {
 
     String ORGANIZATION = "organizations";
 
+    String ORGANIZATION_ROLE = "user_roles";
+
     String BOARD = "boards";
 
     String BOARD_COLUMN = "board_columns";

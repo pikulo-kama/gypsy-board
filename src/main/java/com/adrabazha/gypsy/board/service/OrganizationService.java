@@ -25,4 +25,8 @@ public interface OrganizationService {
     OrganizationResponse getOrganizationResponseDto(Long organizationId, User currentUser);
 
     List<UserResponse> getOrganizationMembers(Long organizationId);
+
+    String getOrganizationMemberRole(Long userId, Long organizationId);
+
+    UserMessage getMemberBlockedActionsSelector(Long userId, Long organizationId);
 }

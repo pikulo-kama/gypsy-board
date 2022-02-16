@@ -31,7 +31,7 @@
             </div>
         </div>
         <div class="d-flex flex-row mt-3">
-            <button type="button" class="btn btn-outline-dark btn-rounded" data-mdb-ripple-color="dark" data-mdb-toggle="modal" data-mdb-target="#create-board-modal">Create Board</button>
+            <button id="create-board-btn" type="button" class="btn btn-outline-dark btn-rounded" data-mdb-ripple-color="dark" data-mdb-toggle="modal" data-mdb-target="#create-board-modal">Create Board</button>
             <button id="remove-organization-btn" type="button" class="btn btn-outline-danger btn-rounded ms-3"><i class="fas fa-recycle"></i></button>
         </div>
     </div>

@@ -17,7 +17,7 @@
                 <button id="close-board-window-btn" type="button" class="btn bg-main" data-mdb-dismiss="modal">
                     Close
                 </button>
-                <button id="create-board-btn" type="button" class="btn bg-sub">Save</button>
+                <button id="modal-create-board-btn" type="button" class="btn bg-sub">Save</button>
             </div>
         </div>
     </div>
