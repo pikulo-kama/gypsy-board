@@ -18,5 +18,5 @@ public interface BoardService {
 
     UserMessage updateBoard(BoardUpdateForm dto);
 
-    void deleteBoard(String boardHash, User authenticatedUser);
+    void deleteBoard(String boardHash);
 }

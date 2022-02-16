@@ -86,7 +86,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Override
     @Transactional
-    public UserMessage deleteOrganization(String organizationHash, User currentUser) {
+    public UserMessage deleteOrganization(String organizationHash) {
         Long organizationId = organizationHashResolver.retrieveIdentifier(organizationHash);
         organizationRepository.deleteUsersFromOrganization(organizationId);
         organizationRepository.deleteById(organizationId);

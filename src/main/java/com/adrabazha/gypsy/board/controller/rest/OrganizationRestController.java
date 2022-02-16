@@ -43,9 +43,8 @@ public class OrganizationRestController {
 
     @OrganizationAccess({ADMIN})
     @PostMapping("/delete")
-    public UserMessage deleteOrganization(@RequestParam("o") String organizationHash,
-                                          @AuthenticationPrincipal User currentUser) {
-        return organizationService.deleteOrganization(organizationHash, currentUser);
+    public UserMessage deleteOrganization(@RequestParam("o") String organizationHash) {
+        return organizationService.deleteOrganization(organizationHash);
     }
 
     @GetMapping("/restrictionSelector")

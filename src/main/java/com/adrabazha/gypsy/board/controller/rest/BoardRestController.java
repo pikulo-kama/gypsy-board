@@ -52,7 +52,7 @@ public class BoardRestController {
 
     @OrganizationAccess({ADMIN, ASSISTANT})
     @PostMapping("/delete")
-    public void deleteBoard(@RequestParam("b") String boardHash, @AuthenticationPrincipal User currentUser) {
-        boardService.deleteBoard(boardHash, currentUser);
+    public void deleteBoard(@RequestParam("b") String boardHash) {
+        boardService.deleteBoard(boardHash);
     }
 }

@@ -16,7 +16,7 @@ public interface OrganizationService {
 
     UserMessage createOrganization(OrganizationForm organizationForm, User currentUser);
 
-    UserMessage deleteOrganization(String organizationHash, User currentUser);
+    UserMessage deleteOrganization(String organizationHash);
 
     Boolean isUserInOrganization(User user, Organization organization);
 
