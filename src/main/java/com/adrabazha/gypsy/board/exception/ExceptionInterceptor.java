@@ -14,7 +14,7 @@ import static com.adrabazha.gypsy.board.dto.UserMessage.ERROR_FLASH_ATTRIBUTE;
 @ControllerAdvice
 public class ExceptionInterceptor {
 
-    @ExceptionHandler(UserMessageException.class)
+//    @ExceptionHandler(UserMessageException.class)
     public String handleUserMessageException(UserMessageException exception,
                                              RedirectAttributes attributes,
                                              HttpServletRequest request) {

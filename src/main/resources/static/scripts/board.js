@@ -10,13 +10,14 @@ $('#remove-board-btn').on('click', function () {
 function handleBoardRemoval(boardHash) {
     let request = openRestHttpPostRequest(`/boards/delete?b=${boardHash}`);
     request.onload = function () {
+        let response = new UserMessage(request.responseText);
+        if (response.isSuccess()) window.location.href = '/organizations/active';
         ConfirmModal.closeConfirmWindow();
-        window.location.href = '/organizations/active';
     }
     request.send();
 }
 
-$('#create-board-btn').on('click', function () {
+$('#modal-create-board-btn').on('click', function () {
     let boardName = $('#board-name-field').val();
     let request = openRestHttpPostRequest("/boards/create");
     request.onload = function () {
@@ -29,10 +30,8 @@ $('#create-board-btn').on('click', function () {
                 $('#no-boards-list-item').remove();
             }
             boardListContainer.append(`<li><a href="/boards?b=${boardHash}">${boardName}</a></li>`);
-            $('#close-board-window-btn').trigger('click');
-        } else {
-            console.log(response['message'])
         }
+        $('#close-board-window-btn').trigger('click');
     }
     request.send(JSON.stringify({
         'boardName': boardName

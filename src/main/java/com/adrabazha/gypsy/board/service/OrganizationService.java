@@ -16,7 +16,7 @@ public interface OrganizationService {
 
     UserMessage createOrganization(OrganizationForm organizationForm, User currentUser);
 
-    UserMessage deleteOrganization(String organizationHash);
+    UserMessage deleteOrganization(String organizationHash, User currentUser);
 
     Boolean isUserInOrganization(User user, Organization organization);
 
@@ -25,4 +25,8 @@ public interface OrganizationService {
     OrganizationResponse getOrganizationResponseDto(Long organizationId, User currentUser);
 
     List<UserResponse> getOrganizationMembers(Long organizationId);
+
+    String getOrganizationMemberRole(Long userId, Long organizationId);
+
+    UserMessage getMemberBlockedActionsSelector(Long userId, Long organizationId);
 }

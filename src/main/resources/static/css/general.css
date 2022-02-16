@@ -18,6 +18,12 @@ body {
     color: #f7f7f7;
 }
 
+.inactive {
+    pointer-events: none;
+    cursor: default;
+    opacity: .5;
+}
+
 .app-button {
     flex: 1 1 auto;
     margin: 10px;

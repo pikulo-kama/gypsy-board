@@ -88,7 +88,7 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public void deleteBoard(String boardHash) {
+    public void deleteBoard(String boardHash, User authenticatedUser) {
         Long boardId = boardHashResolver.retrieveIdentifier(boardHash);
         boardRepository.deleteById(boardId);
     }

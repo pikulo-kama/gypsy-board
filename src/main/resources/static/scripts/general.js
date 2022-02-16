@@ -2,6 +2,17 @@ const API_ROUTE_PREFIX = '/api/v1';
 const GET_REQUEST_TYPE = 'GET';
 const POST_REQUEST_TYPE = 'POST';
 
+$(document).ready(function () {
+    let request = openRestHttpGetRequest('/organizations/restrictionSelector');
+    request.onload = function () {
+        let response = new UserMessage(request.responseText);
+        if (response.isSuccess()) {
+            let restrictedObjectsSelector = response.responseData['selector'];
+            $(restrictedObjectsSelector).addClass('inactive');
+        }
+    }
+    request.send();
+});
 
 function openRestHttpGetRequest(url) {
     let request = new XMLHttpRequest();

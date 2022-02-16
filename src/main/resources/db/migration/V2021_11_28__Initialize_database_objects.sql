@@ -19,10 +19,18 @@ CREATE TABLE "boards"
     "organization_id" BIGINT
 );
 
+CREATE TABLE "user_roles"
+(
+    "role_id"   BIGSERIAL PRIMARY KEY,
+    "role_code" VARCHAR(15) NOT NULL,
+    "role_name" VARCHAR(70)
+);
+
 CREATE TABLE "user_organization"
 (
-    "user_id"         BIGINT,
-    "organization_id" BIGINT
+    "user_id"         BIGINT NOT NULL,
+    "organization_id" BIGINT NOT NULL,
+    role_id           BIGINT NOT NULL
 );
 
 CREATE TABLE "board_columns"
@@ -65,6 +73,9 @@ ALTER TABLE "user_organization"
 
 ALTER TABLE "user_organization"
     ADD FOREIGN KEY ("organization_id") REFERENCES "organizations" ("organization_id");
+
+ALTER TABLE "user_organization"
+    ADD FOREIGN KEY ("role_id") REFERENCES "user_roles" ("role_id") ON DELETE CASCADE;
 
 ALTER TABLE "tasks"
     ADD FOREIGN KEY ("column_id") REFERENCES "board_columns" ("column_id") ON DELETE CASCADE;
