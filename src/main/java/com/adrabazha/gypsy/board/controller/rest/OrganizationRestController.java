@@ -5,6 +5,9 @@ import com.adrabazha.gypsy.board.domain.User;
 import com.adrabazha.gypsy.board.dto.OrganizationToken;
 import com.adrabazha.gypsy.board.dto.UserMessage;
 import com.adrabazha.gypsy.board.dto.form.OrganizationForm;
+import com.adrabazha.gypsy.board.dto.form.OrganizationMemberForm;
+import com.adrabazha.gypsy.board.dto.form.OrganizationMembersForm;
+import com.adrabazha.gypsy.board.dto.form.UpdateMemberRoleForm;
 import com.adrabazha.gypsy.board.service.OrganizationService;
 import com.adrabazha.gypsy.board.service.SessionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,8 +40,9 @@ public class OrganizationRestController {
 
     @PostMapping("/create")
     public UserMessage createOrganization(@AuthenticationPrincipal User currentUser,
-                                          @Validated @RequestBody OrganizationForm organizationForm) {
-        return organizationService.createOrganization(organizationForm, currentUser);
+                                          @Validated @RequestBody OrganizationForm organizationForm,
+                                          HttpServletRequest request) {
+        return organizationService.createOrganization(organizationForm, currentUser, request);
     }
 
     @OrganizationAccess({ADMIN})
@@ -52,5 +56,28 @@ public class OrganizationRestController {
                                                        HttpServletRequest request) {
         OrganizationToken token = sessionService.getUserActiveOrganization(request);
         return organizationService.getMemberBlockedActionsSelector(currentUser.getUserId(), token.getOrganizationId());
+    }
+
+    @OrganizationAccess({ADMIN})
+    @PostMapping("/updateUserRole")
+    public UserMessage updateMemberRole(@Validated @RequestBody UpdateMemberRoleForm form, HttpServletRequest request) {
+        OrganizationToken token = sessionService.getUserActiveOrganization(request);
+        return organizationService.updateMemberRole(form, token.getOrganizationId());
+    }
+
+    @OrganizationAccess({ADMIN, ASSISTANT})
+    @PostMapping("/addMembers")
+    public UserMessage addOrganizationMembers(@Validated @RequestBody OrganizationMembersForm form,
+                                              HttpServletRequest request) {
+        OrganizationToken token = sessionService.getUserActiveOrganization(request);
+        return organizationService.addMembersToOrganization(form, token.getOrganizationId(), request);
+    }
+
+    @OrganizationAccess({ADMIN})
+    @PostMapping("/removeMember")
+    public UserMessage removeOrganizationMember(@Validated @RequestBody OrganizationMemberForm form,
+                                                HttpServletRequest request) {
+        OrganizationToken token = sessionService.getUserActiveOrganization(request);
+        return organizationService.removeOrganizationMember(form, token.getOrganizationId());
     }
 }

@@ -1,4 +1,4 @@
-package com.adrabazha.gypsy.board.domain.auth;
+package com.adrabazha.gypsy.board.token.domain;
 
 import com.adrabazha.gypsy.board.domain.PrimaryKeys;
 import com.adrabazha.gypsy.board.domain.Tables;
@@ -26,7 +26,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Entity
 @Table(name = Tables.REGISTRATION_TOKEN)
-public class RegistrationToken {
+public class RegistrationToken implements Token {
 
     @Id
     @Column(name = PrimaryKeys.REGISTRATION_TOKEN)

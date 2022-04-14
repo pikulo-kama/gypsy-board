@@ -25,7 +25,7 @@ public class LandingController {
 
     @GetMapping
     public String getHomePage(@AuthenticationPrincipal User currentUser, Model model) {
-        List<OrganizationReferenceResponse> availableOrganizations = organizationService.getAvailableOrganizations(currentUser.getUserId());
+        List<OrganizationReferenceResponse> availableOrganizations = organizationService.getOrganizationsByUser(currentUser.getUserId());
         model.addAttribute("availableOrganizations", availableOrganizations);
         return "index";
     }

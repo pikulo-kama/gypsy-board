@@ -1,18 +1,19 @@
-package com.adrabazha.gypsy.board.service.auth;
+package com.adrabazha.gypsy.board.token.service;
 
 import com.adrabazha.gypsy.board.domain.User;
-import com.adrabazha.gypsy.board.domain.auth.RegistrationToken;
-import com.adrabazha.gypsy.board.repository.RegistrationTokenRepository;
+import com.adrabazha.gypsy.board.token.domain.RegistrationToken;
+import com.adrabazha.gypsy.board.token.context.RegistrationTokenContext;
+import com.adrabazha.gypsy.board.token.repository.RegistrationTokenRepository;
 import com.adrabazha.gypsy.board.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class RegistrationTokenServiceImpl implements RegistrationTokenService {
@@ -30,18 +31,7 @@ public class RegistrationTokenServiceImpl implements RegistrationTokenService {
     }
 
     @Override
-    public RegistrationToken createToken(User user) {
-        RegistrationToken token = RegistrationToken.builder()
-                .token(UUID.randomUUID().toString())
-                .expiryDate(getExpiryDate())
-                .user(user)
-                .build();
-
-        return registrationTokenRepository.save(token);
-    }
-
-    @Override
-    public Boolean validateToken(String token) {
+    public Boolean validate(String token) {
         Optional<RegistrationToken> registrationToken = registrationTokenRepository.getByToken(token);
         if (registrationToken.isEmpty()) {
             return false;
@@ -61,27 +51,28 @@ public class RegistrationTokenServiceImpl implements RegistrationTokenService {
     }
 
     @Override
-    public List<RegistrationToken> getExpiredTokens() {
-        return registrationTokenRepository.getRegistrationTokensByExpiryDateBefore(new Date());
+    public RegistrationToken createToken(RegistrationTokenContext context) {
+        RegistrationToken token = RegistrationToken.builder()
+                .token(UUID.randomUUID().toString())
+                .expiryDate(getExpiryDate(tokenLifetimeHours))
+                .user(context.getUser())
+                .build();
+
+        return registrationTokenRepository.save(token);
     }
 
     @Override
-    public void deleteExpiredTokens() {
+    public void cleanExpiredTokens() {
         List<RegistrationToken> expiredTokens = getExpiredTokens();
+        List<User> usersToDelete = expiredTokens.stream()
+                .map(RegistrationToken::getUser)
+                .collect(Collectors.toList());
+
+        userService.deleteUsers(usersToDelete);
         registrationTokenRepository.deleteAll(expiredTokens);
     }
 
-    private Date getExpiryDate() {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(new Date());
-        calendar.add(Calendar.HOUR_OF_DAY, tokenLifetimeHours);
-
-        return calendar.getTime();
-    }
-
-    private Boolean isExpired(RegistrationToken token) {
-        long expiryDate = token.getExpiryDate().getTime();
-        long now = new Date().getTime();
-        return now > expiryDate;
+    private List<RegistrationToken> getExpiredTokens() {
+        return registrationTokenRepository.getRegistrationTokensByExpiryDateBefore(new Date());
     }
 }

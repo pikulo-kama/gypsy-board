@@ -14,20 +14,51 @@ public interface OrganizationRepository extends JpaRepository<Organization, Long
     Boolean existsByOrganizationName(@NotNull String organizationName);
 
     @Modifying
-    @Query(value = "INSERT INTO USER_ORGANIZATION (user_id, organization_id, role_id) " +
-                    "VALUES (:userId, :organizationId, :roleId)", nativeQuery = true)
+    @Query(value = "INSERT INTO USER_ORGANIZATION (user_id, organization_id, role_id, is_invitation_accepted) " +
+            "VALUES (:userId, :organizationId, :roleId, :accepted)", nativeQuery = true)
     void addUserToOrganization(@Param("userId") Long userId,
                                @Param("organizationId") Long organizationId,
-                               @Param("roleId") Long roleId);
+                               @Param("roleId") Long roleId,
+                               @Param("accepted") Boolean isInvitationAccepted);
+
+    @Modifying
+    @Query(value = "UPDATE user_organization SET role_id = :roleId " +
+            "WHERE user_id = :userId AND organization_id = :organizationId", nativeQuery = true)
+    void updateUserRoleInOrganization(@Param("userId") Long userId,
+                                      @Param("organizationId") Long organizationId,
+                                      @Param("roleId") Long roleId);
+
+    @Modifying
+    @Query(value = "UPDATE user_organization SET is_invitation_accepted = :accepted " +
+            "WHERE user_id = :userId AND organization_id = :organizationId", nativeQuery = true)
+    void updateUserInOrganization(@Param("userId") Long userId,
+                                  @Param("organizationId") Long organizationId,
+                                  @Param("accepted") Boolean isAccepted);
+
 
     @Modifying
     @Query(value = "DELETE FROM USER_ORGANIZATION " +
-                    "WHERE organization_id = :organizationId", nativeQuery = true)
+            "WHERE organization_id = :organizationId", nativeQuery = true)
     void deleteUsersFromOrganization(@Param("organizationId") Long organizationId);
+
+    @Modifying
+    @Query(value = "DELETE FROM USER_ORGANIZATION " +
+            "WHERE organization_id = :organizationId AND user_id = :userId", nativeQuery = true)
+    void deleteConcreteUserFromOrganization(@Param("organizationId") Long organizationId,
+                                            @Param("userId") Long userId);
 
     @Query(value = "SELECT role_code FROM user_roles WHERE role_id = (SELECT role_id " +
             "FROM user_organization WHERE user_id = :userId AND organization_id = :orgId)", nativeQuery = true)
     String getOrganizationMemberRole(@Param("userId") Long userId, @Param("orgId") Long organizationId);
+
+    @Query(value = "SELECT is_invitation_accepted FROM user_organization WHERE user_id = :userId AND organization_id = :orgId", nativeQuery = true)
+    Boolean isInvitationAccepted(@Param("userId") Long userId, @Param("orgId") Long organizationId);
+
+    @Query(value = "SELECT COUNT(*) FROM user_organization " +
+            "WHERE organization_id = :organizationId AND role_id = (SELECT role_id " +
+            "                                                       FROM user_roles" +
+            "                                                       WHERE role_code = 'admin')", nativeQuery = true)
+    Integer getAdminCountInOrganization(@Param("organizationId") Long organizationId);
 
     @Query(value = "SELECT ua.object_selector " +
             "from role_blocked_actions a " +

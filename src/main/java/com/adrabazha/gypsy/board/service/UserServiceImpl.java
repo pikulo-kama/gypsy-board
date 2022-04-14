@@ -2,12 +2,14 @@ package com.adrabazha.gypsy.board.service;
 
 import com.adrabazha.gypsy.board.domain.Organization;
 import com.adrabazha.gypsy.board.domain.User;
+import com.adrabazha.gypsy.board.dto.UserMessage;
 import com.adrabazha.gypsy.board.dto.form.RegisterForm;
 import com.adrabazha.gypsy.board.dto.response.UserResponse;
 import com.adrabazha.gypsy.board.event.RegistrationCompletedEvent;
 import com.adrabazha.gypsy.board.exception.GeneralException;
 import com.adrabazha.gypsy.board.exception.UserMessageException;
 import com.adrabazha.gypsy.board.mapper.UserMapper;
+import com.adrabazha.gypsy.board.repository.OrganizationRepository;
 import com.adrabazha.gypsy.board.repository.UserRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,14 +35,16 @@ public class UserServiceImpl implements UserService, UserDetailsService, Authent
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
+    private final OrganizationRepository organizationRepository;
 
     @Autowired
     public UserServiceImpl(ApplicationEventPublisher eventPublisher, UserRepository userRepository,
-                           PasswordEncoder passwordEncoder, UserMapper userMapper) {
+                           PasswordEncoder passwordEncoder, UserMapper userMapper, OrganizationRepository organizationRepository) {
         this.eventPublisher = eventPublisher;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.userMapper = userMapper;
+        this.organizationRepository = organizationRepository;
     }
 
     @Override
@@ -69,7 +74,7 @@ public class UserServiceImpl implements UserService, UserDetailsService, Authent
 
         if (!inputString.isEmpty()) {
             Pageable userLimit = PageRequest.of(0, 5);
-            users = userRepository.findUsersByUsernameContainsOrFullNameContains(inputString, inputString, userLimit)
+            users = userRepository.findUsersByUsernameContainsOrFullNameContainsAndIsEnabled(inputString, inputString, true, userLimit)
                     .stream()
                     .map(userMapper::mapUserToResponse)
                     .collect(Collectors.toList());
@@ -96,6 +101,28 @@ public class UserServiceImpl implements UserService, UserDetailsService, Authent
     @Override
     public List<User> findUsersFromOrganization(Organization organization, String input) {
         return userRepository.findUsersByOrganizationsContainsAndUsernameContains(organization, input);
+    }
+
+    @Override
+    @Transactional
+    public UserMessage findOrganizationMembersByInput(String input, Long organizationId) {
+        List<UserResponse> userResponses = lookupByInputString(input);
+
+        Organization organization = organizationRepository.findById(organizationId)
+                .orElseThrow(() -> new UserMessageException("Organization not found"));
+
+        List<String> memberUsernames = findUsersFromOrganization(organization).stream()
+                .map(User::getUsername)
+                .collect(Collectors.toList());
+
+        userResponses = userResponses.stream()
+                .filter(userResponse -> !memberUsernames.contains(userResponse.getUsername()))
+                .collect(Collectors.toList());
+
+        UserMessage userMessage = UserMessage.success(String.format("%d users was found", userResponses.size()));
+        userMessage.addResponseDataEntry("users", userResponses);
+
+        return userMessage;
     }
 
     @Override

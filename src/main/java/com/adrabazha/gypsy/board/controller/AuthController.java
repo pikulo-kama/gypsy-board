@@ -2,7 +2,7 @@ package com.adrabazha.gypsy.board.controller;
 
 import com.adrabazha.gypsy.board.dto.form.RegisterForm;
 import com.adrabazha.gypsy.board.service.AuthenticationService;
-import com.adrabazha.gypsy.board.service.auth.RegistrationTokenService;
+import com.adrabazha.gypsy.board.token.service.RegistrationTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
@@ -39,7 +39,7 @@ public class AuthController {
 
     @GetMapping("/confirmEmail")
     public String confirmEmail(@RequestParam("token") String token) {
-        Boolean valid = registrationTokenService.validateToken(token);
+        Boolean valid = registrationTokenService.validate(token);
         String returnPage = valid ? "/login" : "/error";
         return "redirect:" + returnPage;
     }

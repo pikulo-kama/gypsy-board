@@ -11,9 +11,13 @@ import lombok.NoArgsConstructor;
 @Builder
 @Data
 @JsonSerialize
-public class UserImageResponse {
+public class UserReferenceResponse {
+
+    private String userHash;
+
+    private Boolean isInvitationAccepted;
 
     private String fullName;
 
-    private String imageName;
+    private String activeRole;
 }

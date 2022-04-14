@@ -17,7 +17,7 @@ public class OrganizationResponse {
 
     private String organizationHash;
 
-    private List<UserImageResponse> organizationMembers;
+    private List<UserReferenceResponse> organizationMembers;
 
     private List<BoardReferenceResponse> organizationBoards;
 }

@@ -3,10 +3,28 @@ const ADD_REFERENCE = 'user-add-reference';
 
 let selectedUsers = [];
 let defaultUserPictures = [];
+let userRoles = {};
 
 $('#remove-organization-btn').on('click', function () {
     let organizationHash = $('.organization-container').attr('id');
     ConfirmModal.openConfirmWindow(organizationHash, 'handleOrganizationDeletion');
+});
+
+$(document).on('change', '.organization-role-select', function () {
+
+    let selectObject = $(this);
+    let roleCode = selectObject.find(":selected").attr('value');
+    let userHash = selectObject.closest('tr').find(".member-name").attr('id');
+
+    let request = openRestHttpPostRequest("/organizations/updateUserRole");
+    request.onload = function () {
+        let response = new UserMessage(request.responseText);
+        selectObject.val(response.responseData['newRole']);
+    }
+    request.send(JSON.stringify({
+        'roleCode': roleCode,
+        'userHash': userHash
+    }));
 });
 
 function handleOrganizationDeletion(organizationHash) {
@@ -19,6 +37,85 @@ function handleOrganizationDeletion(organizationHash) {
         ConfirmModal.closeConfirmWindow();
     }
     request.send();
+}
+
+$('#add-members-modal-btn').on('click', function () {
+
+    let members = [];
+    for (let user of $('#selected-user-list').children()) {
+        members.push($(user).attr('username'));
+    }
+
+    let request = openRestHttpPostRequest("/organizations/addMembers");
+    request.onload = function () {
+        let response = new UserMessage(request.responseText);
+        if (response.isSuccess()) {
+
+            let members = response.responseData['organizationMembers'];
+            let roles = response.responseData['organizationRoles'];
+
+            members.forEach(function (member) {
+                let options = '';
+
+                roles.forEach(function (userRole) {
+                    options += `<option value="${userRole.roleCode}" 
+                                            ${member.activeRole === userRole.roleCode ? 'selected' : ''}>
+                                            ${userRole.roleName}</option>`;
+                });
+
+                let isInvitationAcceptedHtml = member.isInvitationAccepted ?
+                    '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-times-circle"></i>';
+
+                let tableRow = `<tr>
+                                    <td class="p-0 ps-1">
+                                        <a role="button" class="fg-sub hover-fg-main">
+                                            ${isInvitationAcceptedHtml}
+                                        </a>
+                                    </td>
+                                    <td class="member-name p-0" id="${member.userHash}">${member.fullName}</td>
+                                    <td class="p-0">
+                                        <select class="organization-role-select">
+                                            ${options}
+                                        </select>
+                                    </td>
+                                    <td class="p-0 pe-1">
+                                        <a role="button" class="remove-organization-member-btn fg-sub hover-fg-main">
+                                            <i class="fas fa-recycle"></i>
+                                        </a>
+                                    </td>
+                                </tr>`;
+
+                $('#organization-members-table').append(tableRow);
+            });
+        }
+        $('#close-add-members-window-btn').trigger('click');
+    }
+    request.send(JSON.stringify({
+        "organizationMembers": members
+    }));
+});
+
+$(document).on('click', '.remove-organization-member-btn', function () {
+
+    let memberContainer = $(this).closest('tr').find('td.member-name');
+    let memberHash = memberContainer.attr('id');
+
+    ConfirmModal.openConfirmWindow(memberHash, "handleMemberDeletion");
+});
+
+function handleMemberDeletion(memberHash) {
+    let request = openRestHttpPostRequest("/organizations/removeMember");
+    request.onload = function () {
+        let response = new UserMessage(request.responseText);
+        if (response.isSuccess()) {
+            let removedMemberHash = response.responseData['removedMemberHash'];
+            $(`#${removedMemberHash}`).closest('tr').remove();
+        }
+        ConfirmModal.closeConfirmWindow();
+    };
+    request.send(JSON.stringify({
+        "memberHash": memberHash
+    }));
 }
 
 $('#create-organization-btn').on('click', function () {
@@ -70,10 +167,32 @@ function onUserRemoveCallback(node) {
     $(node).remove();
 }
 
+$('#member-lookup-input').on("change keyup paste", function () {
+    let httpRequest = openRestHttpGetRequest('/users/lookupMembers?input='.concat($(this).val()));
+
+    httpRequest.onload = function () {
+        let response = new UserMessage(httpRequest.responseText);
+        if (response.isSuccess()) {
+            let userListSelector = $('#lookup-user-list');
+            let users = response.responseData["users"];
+
+            userListSelector.empty();
+            for (let user of users) {
+                if (!selectedUsers.includes(user['username'])) {
+                    userListSelector.append(getListItemString(user['username'], user['fullName'], ADD_REFERENCE));
+                }
+            }
+        }
+
+    }
+    httpRequest.send();
+});
+
+
 $('#user-lookup-input').on("change keyup paste", function () {
     let httpRequest = openRestHttpGetRequest('/users/lookup?input='.concat($(this).val()));
 
-    httpRequest.onreadystatechange = function () {
+    httpRequest.onload = function () {
         let userListSelector = $('#lookup-user-list');
         let users = [];
         if (httpRequest.responseText !== '') {
