@@ -2,6 +2,7 @@ package com.adrabazha.gypsy.board.controller.rest;
 
 import com.adrabazha.gypsy.board.domain.User;
 import com.adrabazha.gypsy.board.dto.OrganizationToken;
+import com.adrabazha.gypsy.board.dto.UserMessage;
 import com.adrabazha.gypsy.board.dto.response.UserResponse;
 import com.adrabazha.gypsy.board.service.OrganizationService;
 import com.adrabazha.gypsy.board.service.SessionService;
@@ -42,6 +43,14 @@ public class UserRestController {
         return foundUsers.stream()
                 .filter(user -> !StringUtils.equals(user.getUsername(), currentUser.getUsername()))
                 .collect(Collectors.toList());
+    }
+
+    @GetMapping("/lookupMembers")
+    public UserMessage getMembersByInput(@AuthenticationPrincipal User currentUser,
+                                         @RequestParam("input") String input,
+                                         HttpServletRequest request) {
+        OrganizationToken token = sessionService.getUserActiveOrganization(request);
+        return userService.findOrganizationMembersByInput(input, token.getOrganizationId());
     }
 
     @GetMapping("/activeOrganizationMembers")

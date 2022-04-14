@@ -17,4 +17,6 @@ public interface PrimaryKeys {
     String COMMENT = "comment_id";
 
     String REGISTRATION_TOKEN = "registration_token_id";
+
+    String MEMBERSHIP_TOKEN = "membership_token_id";
 }

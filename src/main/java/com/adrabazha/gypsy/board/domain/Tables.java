@@ -17,4 +17,7 @@ public interface Tables {
     String COMMENT = "comments";
 
     String REGISTRATION_TOKEN = "registration_tokens";
+
+    String MEMBERSHIP_TOKEN = "membership_tokens";
+    String USER_ORGANIZATION = "user_organization";
 }

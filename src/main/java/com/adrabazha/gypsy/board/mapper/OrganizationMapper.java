@@ -4,7 +4,7 @@ import com.adrabazha.gypsy.board.domain.Organization;
 import com.adrabazha.gypsy.board.dto.response.BoardReferenceResponse;
 import com.adrabazha.gypsy.board.dto.response.OrganizationReferenceResponse;
 import com.adrabazha.gypsy.board.dto.response.OrganizationResponse;
-import com.adrabazha.gypsy.board.dto.response.UserImageResponse;
+import com.adrabazha.gypsy.board.dto.response.UserReferenceResponse;
 import com.adrabazha.gypsy.board.utils.resolver.OrganizationHashResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -28,8 +28,8 @@ public class OrganizationMapper {
     }
 
     public OrganizationResponse mapOrganizationToResponse(Organization organization) {
-        List<UserImageResponse> members = organization.getUsers().stream()
-                .map(userMapper::mapUserToImageResponse)
+        List<UserReferenceResponse> members = organization.getUsers().stream()
+                .map(userMapper::mapUserToReferenceResponse)
                 .collect(Collectors.toList());
 
         List<BoardReferenceResponse> boards = organization.getBoards().stream()
