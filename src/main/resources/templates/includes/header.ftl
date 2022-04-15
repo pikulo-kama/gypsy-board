@@ -1,3 +1,7 @@
+<#if Session.SPRING_SECURITY_CONTEXT??>
+    <#assign userAuthenticated = Session.SPRING_SECURITY_CONTEXT.authentication.principal />
+</#if>
+
 <!doctype html>
 <html lang="uk">
 <head>
@@ -31,24 +35,9 @@
     <title>Gypsy Board</title>
 </head>
 <body>
-<#if error??>
-    <script type="text/javascript">
-        $(document).ready(function () {
-            showPopup('${error.message}',
-                '${error.userMessageType.primaryColor}',
-                '${error.userMessageType.secondaryColor}');
-        })
-    </script>
-</#if>
 
 <#include "../includes/modal/confirm.ftl">
 
-<div class="popup-container">
-    <div class="popup-content">
-        <div class="popup-close-button">&times;</div>
-        <p class="popup-message"></p>
-    </div>
-</div>
 
 <nav class="navbar navbar-expand-lg navbar-light fixed-top bg-forth">
     <div class="container-fluid">
@@ -60,14 +49,16 @@
                 aria-label="Toggle navigation"><i class="fas fa-bars"></i></button>
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item"><a class="nav-link" href="/organizations/active"><i class="fas fa-bullseye"></i>  Active Organization</a></li>
-            </ul>
-            <ul class="navbar-nav d-flex flex-row me-1">
-                <li class="nav-item me-3 me-lg-0">
-                    <a class="nav-link btn btn-outline-dark bg-third" href="/logout"><i class="fas fa-door-open"></i></a>
-                </li>
-            </ul>
+            <#if userAuthenticated??>
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link" href="/organizations/active"><i class="fas fa-bullseye"></i>  Active Organization</a></li>
+                </ul>
+                <ul class="navbar-nav d-flex flex-row me-1">
+                    <li class="nav-item me-3 me-lg-0">
+                        <a class="nav-link btn btn-outline-dark bg-third" href="/logout"><i class="fas fa-door-open"></i></a>
+                    </li>
+                </ul>
+            </#if>
         </div>
     </div>
 </nav>
