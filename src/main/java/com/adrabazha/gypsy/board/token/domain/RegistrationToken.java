@@ -2,7 +2,7 @@ package com.adrabazha.gypsy.board.token.domain;
 
 import com.adrabazha.gypsy.board.domain.PrimaryKeys;
 import com.adrabazha.gypsy.board.domain.Tables;
-import com.adrabazha.gypsy.board.domain.User;
+import com.adrabazha.gypsy.board.domain.sql.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

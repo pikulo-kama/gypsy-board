@@ -1,6 +1,6 @@
 package com.adrabazha.gypsy.board.repository;
 
-import com.adrabazha.gypsy.board.domain.Board;
+import com.adrabazha.gypsy.board.domain.sql.Board;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

@@ -1,8 +1,6 @@
 package com.adrabazha.gypsy.board.controller.rest;
 
 import com.adrabazha.gypsy.board.annotation.OrganizationAccess;
-import com.adrabazha.gypsy.board.domain.Role;
-import com.adrabazha.gypsy.board.domain.User;
 import com.adrabazha.gypsy.board.dto.OrganizationToken;
 import com.adrabazha.gypsy.board.dto.UserMessage;
 import com.adrabazha.gypsy.board.dto.form.BoardCreateForm;
@@ -10,8 +8,6 @@ import com.adrabazha.gypsy.board.dto.form.BoardUpdateForm;
 import com.adrabazha.gypsy.board.service.BoardService;
 import com.adrabazha.gypsy.board.service.SessionService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Profile;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

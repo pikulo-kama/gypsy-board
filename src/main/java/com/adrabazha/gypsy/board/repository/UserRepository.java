@@ -1,7 +1,7 @@
 package com.adrabazha.gypsy.board.repository;
 
-import com.adrabazha.gypsy.board.domain.Organization;
-import com.adrabazha.gypsy.board.domain.User;
+import com.adrabazha.gypsy.board.domain.sql.Organization;
+import com.adrabazha.gypsy.board.domain.sql.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 

@@ -1,7 +1,7 @@
 package com.adrabazha.gypsy.board.mapper;
 
-import com.adrabazha.gypsy.board.domain.Board;
-import com.adrabazha.gypsy.board.domain.BoardColumn;
+import com.adrabazha.gypsy.board.domain.sql.Board;
+import com.adrabazha.gypsy.board.domain.sql.BoardColumn;
 import com.adrabazha.gypsy.board.dto.response.BoardColumnResponse;
 import com.adrabazha.gypsy.board.dto.response.BoardReferenceResponse;
 import com.adrabazha.gypsy.board.dto.response.BoardResponse;

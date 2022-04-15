@@ -1,9 +1,9 @@
 package com.adrabazha.gypsy.board.service;
 
-import com.adrabazha.gypsy.board.domain.Organization;
+import com.adrabazha.gypsy.board.domain.sql.Organization;
 import com.adrabazha.gypsy.board.domain.OrganizationRole;
 import com.adrabazha.gypsy.board.domain.Role;
-import com.adrabazha.gypsy.board.domain.User;
+import com.adrabazha.gypsy.board.domain.sql.User;
 import com.adrabazha.gypsy.board.dto.UserMessage;
 import com.adrabazha.gypsy.board.dto.form.OrganizationForm;
 import com.adrabazha.gypsy.board.dto.form.OrganizationMemberForm;

@@ -3,7 +3,10 @@ spring:
     url: ${GYPSY_BOARD_POSTGRES_URL:jdbc:postgresql://localhost:5435/gypsyboard}
     username: ${GYPSY_BOARD_POSTGRES_USER:admin}
     password: ${GYPSY_BOARD_POSTGRES_PASS:admin}
-    driver-class-name: org.postgresql.Driver
+  data:
+    mongodb:
+      uri: ${GYPSY_BOARD_MONGO_URL:mongodb://localhost:27017/gypsy-board-mongo}
+
   freemarker:
     suffix: .ftl
     template-loader-path: classpath:/templates/

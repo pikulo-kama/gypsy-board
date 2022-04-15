@@ -1,6 +1,6 @@
 package com.adrabazha.gypsy.board.controller;
 
-import com.adrabazha.gypsy.board.domain.User;
+import com.adrabazha.gypsy.board.domain.sql.User;
 import com.adrabazha.gypsy.board.dto.response.BoardResponse;
 import com.adrabazha.gypsy.board.service.BoardService;
 import org.springframework.beans.factory.annotation.Autowired;

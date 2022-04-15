@@ -1,6 +1,6 @@
 package com.adrabazha.gypsy.board.token.service;
 
-import com.adrabazha.gypsy.board.domain.User;
+import com.adrabazha.gypsy.board.domain.sql.User;
 import com.adrabazha.gypsy.board.token.domain.RegistrationToken;
 import com.adrabazha.gypsy.board.token.context.RegistrationTokenContext;
 import com.adrabazha.gypsy.board.token.repository.RegistrationTokenRepository;
