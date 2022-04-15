@@ -5,6 +5,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.10.2/mdb.min.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"/>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"/>
+    <link rel="stylesheet" href="//cdn.quilljs.com/1.0.0/quill.snow.css" />
+    <link rel="stylesheet" href="//cdn.quilljs.com/1.0.0/quill.bubble.css" />
 
     <link href="https://fonts.googleapis.com/css2?family=Teko&display=swap" rel="stylesheet">
 
@@ -14,9 +16,11 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js" type="text/javascript"></script>
-    <script src="https://kit.fontawesome.com/926f077d93.js" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="https://kit.fontawesome.com/926f077d93.js" crossorigin="anonymous"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.10.2/mdb.min.js"></script>
+    <script type="text/javascript" src="//cdn.quilljs.com/1.1.3/quill.js"></script>
+    <script type="text/javascript" src="//cdn.quilljs.com/1.1.3/quill.min.js"></script>
     <script type="text/javascript" src="/scripts/popup.js"></script>
     <script type="text/javascript" src="/scripts/general.js"></script>
     <script type="text/javascript" src="/scripts/domain/usermessage.js"></script>

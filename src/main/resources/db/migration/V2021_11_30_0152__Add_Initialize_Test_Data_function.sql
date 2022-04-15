@@ -35,16 +35,16 @@ BEGIN
     SELECT column_id INTO columnId FROM "board_columns" WHERE "column_name" = 'Primary';
 
     INSERT INTO "tasks" (task_name, task_order, column_id, user_assigned_id, task_description)
-    VALUES ('Primary Task #1', 10, columnId, userId, 'text'),
-           ('Primary Task #2', 20, columnId, userId, 'text'),
-           ('Primary Task #3', 30, columnId, userId, 'text');
+    VALUES ('Primary Task #1', 10, columnId, userId, '{"ops":[{"insert":"\n"}]}'),
+           ('Primary Task #2', 20, columnId, userId, '{"ops":[{"insert":"\n"}]}'),
+           ('Primary Task #3', 30, columnId, userId, '{"ops":[{"insert":"\n"}]}');
 
     SELECT column_id INTO columnId FROM "board_columns" WHERE "column_name" = 'Secondary';
 
     INSERT INTO "tasks" (task_name, task_order, column_id, user_assigned_id, task_description)
-    VALUES ('Secondary Task #1', 10, columnId, userId, 'text'),
-           ('Secondary Task #2', 20, columnId, userId, 'text'),
-           ('Secondary Task #3', 30, columnId, userId, 'text');
+    VALUES ('Secondary Task #1', 10, columnId, userId, '{"ops":[{"insert":"\n"}]}'),
+           ('Secondary Task #2', 20, columnId, userId, '{"ops":[{"insert":"\n"}]}'),
+           ('Secondary Task #3', 30, columnId, userId, '{"ops":[{"insert":"\n"}]}');
 END ;
 $body$
     LANGUAGE PLPGSQL

@@ -5,6 +5,12 @@ let taskDescriptionField = $('#task-description-field');
 let assigneeInputField = $('#assignee-input-area');
 let assigneeField = $('#assignee-select-box');
 
+
+var quill = new Quill('#task-editor', {
+    placeholder: 'Describe your task...',
+    theme: 'snow'
+});
+
 $(document).ready(function () {
     let request = openRestHttpGetRequest('/users/activeOrganizationMembers');
     request.onreadystatechange = function () {
@@ -41,7 +47,7 @@ $('#update-task-btn').on('click', function () {
     request.send(JSON.stringify({
         "taskHash": taskHashField.val(),
         "taskName": taskNameField.val(),
-        "taskDescription": taskDescriptionField.val(),
+        "taskDescription": JSON.stringify(quill.getContents()),
         "assigneeUserName": assigneeField.find(':selected').val()
     }));
 
@@ -89,7 +95,7 @@ $(document).on('click', '.draggable-task-modal-link', function() {
 
         taskHashField.val(taskHash);
         taskNameField.val(response['taskName']);
-        taskDescriptionField.val(response['taskDescription']);
+        quill.setContents(JSON.parse(response['taskDescription']));
         visualizeMembers(organizationMembers);
 
         let options = assigneeField.children();

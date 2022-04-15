@@ -15,9 +15,8 @@
                             <label class="form-label" for="task-name-field">Task</label>
                         </div>
                         <div class="form-outline form-white mb-2">
-                            <textarea id="task-description-field" name="taskDescription"
-                                      class="form-text form-control"></textarea>
-                            <label class="form-label" for="task-description-field">Description</label>
+                            <div id="task-toolbar"></div>
+                            <div id="task-editor"></div>
                         </div>
                         <div class="d-flex flex-column">
                             <div class="form-outline form-white mb-2 bg-sub rounded">
