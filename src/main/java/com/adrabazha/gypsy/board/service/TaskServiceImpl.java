@@ -1,8 +1,8 @@
 package com.adrabazha.gypsy.board.service;
 
-import com.adrabazha.gypsy.board.domain.BoardColumn;
-import com.adrabazha.gypsy.board.domain.Task;
-import com.adrabazha.gypsy.board.domain.User;
+import com.adrabazha.gypsy.board.domain.sql.BoardColumn;
+import com.adrabazha.gypsy.board.domain.sql.Task;
+import com.adrabazha.gypsy.board.domain.sql.User;
 import com.adrabazha.gypsy.board.dto.form.ColumnSynchronizationForm;
 import com.adrabazha.gypsy.board.dto.form.TaskCreateForm;
 import com.adrabazha.gypsy.board.dto.form.TaskUpdateForm;

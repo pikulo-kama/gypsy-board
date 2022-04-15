@@ -1,0 +1,15 @@
+.document-container {
+    height: 15rem;
+    width: 10rem;
+    margin: 5px;
+    background-color: var(--third-color);
+    box-shadow: 3px 2px;
+    cursor: pointer;
+}
+
+.document-author-container {
+    background-color: black;
+    height: 10%;
+    font-size: 7pt;
+    opacity: 70%;
+}

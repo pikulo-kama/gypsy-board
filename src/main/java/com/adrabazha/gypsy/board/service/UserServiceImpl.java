@@ -1,7 +1,7 @@
 package com.adrabazha.gypsy.board.service;
 
-import com.adrabazha.gypsy.board.domain.Organization;
-import com.adrabazha.gypsy.board.domain.User;
+import com.adrabazha.gypsy.board.domain.sql.Organization;
+import com.adrabazha.gypsy.board.domain.sql.User;
 import com.adrabazha.gypsy.board.dto.UserMessage;
 import com.adrabazha.gypsy.board.dto.form.RegisterForm;
 import com.adrabazha.gypsy.board.dto.response.UserResponse;

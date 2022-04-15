@@ -1,7 +1,7 @@
 package com.adrabazha.gypsy.board.mapper;
 
 import com.adrabazha.gypsy.board.domain.Comment;
-import com.adrabazha.gypsy.board.domain.User;
+import com.adrabazha.gypsy.board.domain.sql.User;
 import com.adrabazha.gypsy.board.dto.response.CommentResponse;
 import com.adrabazha.gypsy.board.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;

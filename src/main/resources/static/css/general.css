@@ -148,6 +148,22 @@ body {
     color: var(--forth-color)!important;
 }
 
+.hover-bg-main:hover {
+    background: var(--main-color)!important;
+}
+
+.hover-bg-sub:hover {
+    background: var(--sub-color)!important;
+}
+
+.hover-bg-third:hover {
+    background: var(--third-color)!important;
+}
+
+.hover-bg-forth:hover {
+    background: var(--forth-color)!important;
+}
+
 .scrollbar {
     overflow: hidden;
     margin-bottom: 25px;

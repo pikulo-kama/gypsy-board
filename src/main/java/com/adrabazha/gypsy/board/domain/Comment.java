@@ -1,5 +1,6 @@
 package com.adrabazha.gypsy.board.domain;
 
+import com.adrabazha.gypsy.board.domain.sql.Task;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

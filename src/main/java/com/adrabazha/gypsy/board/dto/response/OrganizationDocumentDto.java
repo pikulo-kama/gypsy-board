@@ -1,4 +1,4 @@
-package com.adrabazha.gypsy.board.token.context;
+package com.adrabazha.gypsy.board.dto.response;
 
 import com.adrabazha.gypsy.board.domain.sql.User;
 import lombok.AllArgsConstructor;
@@ -8,9 +8,13 @@ import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @Data
-public class RegistrationTokenContext implements TokenContext {
+@Builder
+public class OrganizationDocumentDto {
 
-    private User user;
+    private String documentHash;
+
+    private String documentData;
+
+    private User author;
 }

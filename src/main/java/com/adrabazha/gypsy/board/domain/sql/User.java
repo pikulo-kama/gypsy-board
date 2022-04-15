@@ -1,6 +1,9 @@
-package com.adrabazha.gypsy.board.domain;
+package com.adrabazha.gypsy.board.domain.sql;
 
 
+import com.adrabazha.gypsy.board.domain.PrimaryKeys;
+import com.adrabazha.gypsy.board.domain.Tables;
+import com.adrabazha.gypsy.board.domain.sql.Organization;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

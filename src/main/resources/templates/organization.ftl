@@ -67,16 +67,33 @@
 
 
         <div class="d-flex flex-row mt-3">
-            <button id="create-board-btn" type="button" class="btn btn-outline-dark btn-rounded"
-                    data-mdb-ripple-color="dark" data-mdb-toggle="modal" data-mdb-target="#create-board-modal">Create
-                Board
+            <button id="create-board-btn"
+                    type="button"
+                    class="btn btn-outline-dark btn-rounded"
+                    data-mdb-ripple-color="dark"
+                    data-mdb-toggle="modal"
+                    data-mdb-target="#create-board-modal">
+                <i class="fas fa-clipboard-list fa-lg"></i> Create Board
             </button>
-            <button id="add-members-btn" type="button" class="btn btn-outline-dark btn-rounded ms-1"
-                    data-mdb-ripple-color="dark" data-mdb-toggle="modal" data-mdb-target="#add-members-modal">Add
-                Members
+            <button id="add-members-btn"
+                    type="button"
+                    class="btn btn-outline-dark btn-rounded ms-1"
+                    data-mdb-ripple-color="dark"
+                    data-mdb-toggle="modal"
+                    data-mdb-target="#add-members-modal">
+                <i class="fas fa-user fa-lg"></i> Add Members
             </button>
-            <button id="remove-organization-btn" type="button" class="btn btn-outline-danger btn-rounded ms-3"><i
-                        class="fas fa-recycle"></i></button>
+            <a href="/documents?o=${organization.organizationHash}"
+               role="button"
+               class="btn btn-outline-dark btn-rounded ms-1"
+            >
+                <i class="fas fa-file-alt fa-lg"></i> Organization Wiki
+            </a>
+            <button id="remove-organization-btn"
+                    type="button"
+                    class="btn btn-outline-danger btn-rounded ms-3">
+                <i class="fas fa-recycle fa-lg"></i>
+            </button>
         </div>
     </div>
 </div>

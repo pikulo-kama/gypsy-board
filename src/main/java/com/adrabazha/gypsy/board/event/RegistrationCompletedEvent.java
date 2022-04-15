@@ -1,6 +1,6 @@
 package com.adrabazha.gypsy.board.event;
 
-import com.adrabazha.gypsy.board.domain.User;
+import com.adrabazha.gypsy.board.domain.sql.User;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.context.ApplicationEvent;

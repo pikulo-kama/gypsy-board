@@ -1,6 +1,6 @@
 package com.adrabazha.gypsy.board.mapper;
 
-import com.adrabazha.gypsy.board.domain.Organization;
+import com.adrabazha.gypsy.board.domain.sql.Organization;
 import com.adrabazha.gypsy.board.dto.response.BoardReferenceResponse;
 import com.adrabazha.gypsy.board.dto.response.OrganizationReferenceResponse;
 import com.adrabazha.gypsy.board.dto.response.OrganizationResponse;
