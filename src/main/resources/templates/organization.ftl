@@ -9,6 +9,32 @@
         <div class="d-flex flex-column align-items-start w-100">
             <p class="display-1 gradient-text text-center">${organization.organizationName}</p>
 
+            <div class="d-flex flex-row mt-1">
+                <a href="/documents?o=${organization.organizationHash}"
+                   role="button"
+                   class="btn btn-outline-primary ms-1"
+                >
+                    <i class="fas fa-file-alt fa-lg"></i> Organization Wiki
+                </a>
+                <a href="/absences?o=${organization.organizationHash}"
+                   role="button"
+                   class="btn btn-outline-primary ms-1"
+                >
+                    <i class="fas fa-coffee fa-lg"></i> Absence History
+                </a>
+                <a href="/absences/chart?o=${organization.organizationHash}"
+                   role="button"
+                   class="btn btn-outline-primary ms-1"
+                >
+                    <i class="fas fa-chart-area fa-lg"></i> Capacity Chart
+                </a>
+                <a href="/absences/manage?o=${organization.organizationHash}"
+                   role="button"
+                   class="manage-absences-btn btn btn-outline-info btn-rounded ms-5"
+                >
+                    <i class="fas fa-thumbs-up"></i> Manage Absences
+                </a>
+            </div>
             <div class="d-flex flex-row scrollbar scrollbar-x scrollbar-rare-wind pb-5" style="max-height: 40vh">
                 <div class="d-flex flex-column w-50 h-100">
                     <div class="available-data scrollbar scrollbar-y scrollbar-rare-wind">
@@ -89,32 +115,6 @@
                         class="btn btn-outline-danger btn-rounded ms-3">
                     <i class="fas fa-recycle fa-lg"></i>
                 </button>
-            </div>
-            <div class="d-flex flex-row mt-1">
-                <a href="/documents?o=${organization.organizationHash}"
-                   role="button"
-                   class="btn btn-outline-primary ms-1"
-                >
-                    <i class="fas fa-file-alt fa-lg"></i> Organization Wiki
-                </a>
-                <a href="/absences?o=${organization.organizationHash}"
-                   role="button"
-                   class="btn btn-outline-primary ms-1"
-                >
-                    <i class="fas fa-coffee fa-lg"></i> Absence History
-                </a>
-                <a href="/absences/chart?o=${organization.organizationHash}"
-                   role="button"
-                   class="btn btn-outline-primary ms-1"
-                >
-                    <i class="fas fa-chart-area fa-lg"></i> Capacity Chart
-                </a>
-                <a href="/absences/manage?o=${organization.organizationHash}"
-                   role="button"
-                   class="manage-absences-btn btn btn-outline-info btn-rounded ms-5"
-                >
-                    <i class="fas fa-thumbs-up"></i> Manage Absences
-                </a>
             </div>
         </div>
     </div>
