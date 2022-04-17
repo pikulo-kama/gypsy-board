@@ -19,5 +19,6 @@ public interface Tables {
     String REGISTRATION_TOKEN = "registration_tokens";
 
     String MEMBERSHIP_TOKEN = "membership_tokens";
-    String USER_ORGANIZATION = "user_organization";
+
+    String ABSENCE_RECORD = "absence_history";
 }

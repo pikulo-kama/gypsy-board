@@ -38,7 +38,7 @@ public class MailMessage {
     }
 
     public static MailMessage fromOrganization(Organization organization) {
-        List<String> membersEmails = organization.getUsers().stream()
+        List<String> membersEmails = organization.getMembers().stream()
                 .map(User::getEmail)
                 .collect(Collectors.toList());
 

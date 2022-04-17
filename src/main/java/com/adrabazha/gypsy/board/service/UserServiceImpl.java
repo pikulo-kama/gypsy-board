@@ -74,8 +74,9 @@ public class UserServiceImpl implements UserService, UserDetailsService, Authent
 
         if (!inputString.isEmpty()) {
             Pageable userLimit = PageRequest.of(0, 5);
-            users = userRepository.findUsersByUsernameContainsOrFullNameContainsAndIsEnabled(inputString, inputString, true, userLimit)
+            users = userRepository.findUsersByUsernameContainsOrFullNameContains(inputString, inputString, userLimit)
                     .stream()
+                    .filter(User::getIsEnabled)
                     .map(userMapper::mapUserToResponse)
                     .collect(Collectors.toList());
         }

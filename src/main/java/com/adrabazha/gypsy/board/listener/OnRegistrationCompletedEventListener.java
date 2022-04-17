@@ -10,40 +10,46 @@ import com.adrabazha.gypsy.board.utils.HttpUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.Collections;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Component
 public class OnRegistrationCompletedEventListener implements ApplicationListener<RegistrationCompletedEvent> {
 
     private final MailService mailService;
     private final RegistrationTokenService registrationTokenService;
+    private final ExecutorService executorService;
 
     @Autowired
-    public OnRegistrationCompletedEventListener(MailService mailService, RegistrationTokenService registrationTokenService) {
+    public OnRegistrationCompletedEventListener(MailService mailService,
+                                                RegistrationTokenService registrationTokenService) {
         this.mailService = mailService;
         this.registrationTokenService = registrationTokenService;
+        this.executorService = Executors.newCachedThreadPool();
     }
 
     @Override
     public void onApplicationEvent(RegistrationCompletedEvent event) {
-        String baseUrl = HttpUtils.getBaseUrlFromRequest(event.getRequest());
-
         RegistrationTokenContext context = RegistrationTokenContext.builder()
                 .user(event.getUser())
                 .build();
         RegistrationToken token = registrationTokenService.createToken(context);
+        executorService.submit(() -> sendMessage(event, token));
+    }
 
+    private void sendMessage(RegistrationCompletedEvent event, RegistrationToken token) {
+        String baseUrl = HttpUtils.getBaseUrlFromRequest(event.getRequest());
         MailMessage mailMessage = MailMessage.builder()
                 .recipients(Collections.singletonList(event.getUser().getEmail()))
-                .subject("Please confirm your email address")
                 .text(String.format(
                         "To activate your account please follow this link:\n" +
                         "%s/auth/confirmEmail?token=%s",
                         baseUrl, token.getToken())
                 ).build();
 
+        mailMessage.setSubject("Please confirm your email address");
         mailService.sendMessage(mailMessage);
     }
 }
