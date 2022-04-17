@@ -35,7 +35,7 @@ public class Organization {
     @JoinTable(name = "user_organization",
             joinColumns = @JoinColumn(name = "organization_id", referencedColumnName = "organization_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "user_id"))
-    private List<User> users;
+    private List<User> members;
 
     @Fetch(value = FetchMode.SUBSELECT)
     @OneToMany(mappedBy = "organization", fetch = FetchType.LAZY)

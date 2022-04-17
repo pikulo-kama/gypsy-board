@@ -49,7 +49,6 @@ public class OnNewMembersAddedEventListener implements ApplicationListener<NewMe
     private void sendInvitation(User member, Organization organization, MembershipToken token, String baseUrl) {
         MailMessage message = MailMessage.builder()
                 .recipients(Collections.singletonList(member.getEmail()))
-                .subject(String.format("Invitation to '%s'", organization.getOrganizationName()))
                 .text(String.format(
                         "You was invited to '%s'\n" +
                                 "Follow this link to accept invitation\n" +
@@ -57,6 +56,7 @@ public class OnNewMembersAddedEventListener implements ApplicationListener<NewMe
                         organization.getOrganizationName(), baseUrl, token.getToken()
                 )).build();
 
+        message.setSubject(String.format("Invitation to '%s'", organization.getOrganizationName()));
         mailService.sendMessage(message);
     }
 }

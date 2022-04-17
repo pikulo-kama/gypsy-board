@@ -19,4 +19,6 @@ public interface PrimaryKeys {
     String REGISTRATION_TOKEN = "registration_token_id";
 
     String MEMBERSHIP_TOKEN = "membership_token_id";
+
+    String ABSENCE_RECORD = "absence_id";
 }

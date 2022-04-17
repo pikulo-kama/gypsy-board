@@ -24,9 +24,9 @@
                                 <label class="form-label" for="assignee-input-area">Look for assignee here</label>
                             </div>
                             <div class="d-flex flex-row justify-content-center">
-                                <div class="w-50">
+                                <div class="w-100">
                                     <select multiple size="5" name="assigneeUserName" id="assignee-select-box"
-                                            class="available-data scrollbar scrollbar-y scrollbar-rare-wind d-block user-select-none text-center w-100 h-50"></select>
+                                            class="select-box available-data scrollbar scrollbar-y scrollbar-rare-wind d-block user-select-none text-center w-100 h-50"></select>
                                 </div>
                             </div>
                         </div>

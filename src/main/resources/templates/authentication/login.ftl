@@ -13,7 +13,7 @@
 
         <#--    Username    -->
         <div class="form-outline mb-4">
-            <input required name="username" type="text" id="username-address-field" class="form-control bg-third" />
+            <input autofocus="autofocus" autocomplete="off" required name="username" type="text" id="username-address-field" class="form-control bg-third" />
             <label class="form-label" for="username-address-field">Username</label>
         </div>
 
@@ -26,6 +26,11 @@
         <!-- Submit button -->
         <input name="${(_csrf.parameterName)!}" value="${(_csrf.token)!}" type="hidden" />
         <button type="submit" class="btn btn-primary btn-block mb-4 bg-sub">Login</button>
+        <a href="/auth/register"
+           role="button"
+           class="btn btn-sm btn-block fg-sub bg-main hover-bg-forth">
+            Register
+        </a>
     </form>
 </div>
 

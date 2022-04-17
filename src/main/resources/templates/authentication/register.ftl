@@ -50,6 +50,11 @@
         <!-- Submit button -->
         <input name="${(_csrf.parameterName)!}" value="${(_csrf.token)!}" type="hidden" />
         <button type="submit" class="btn btn-primary btn-block mb-4 bg-sub">Sign up</button>
+        <a href="/login"
+           role="button"
+           class="btn btn-sm btn-block fg-sub bg-main hover-bg-forth">
+            Log In
+        </a>
     </form>
 </div>
 <#include "../includes/footer.ftl">

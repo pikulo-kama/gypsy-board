@@ -1,0 +1,19 @@
+#date-range-picker {
+    cursor: pointer;
+}
+
+.ranges ul li {
+    color: black;
+}
+
+.table-condensed th {
+    color: black;
+}
+
+.table-condensed td[class="available"] {
+    color: black;
+}
+
+.table-condensed td.weekend {
+    color: red;
+}

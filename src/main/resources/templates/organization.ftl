@@ -66,34 +66,56 @@
         </div>
 
 
-        <div class="d-flex flex-row mt-3">
-            <button id="create-board-btn"
-                    type="button"
-                    class="btn btn-outline-dark btn-rounded"
-                    data-mdb-ripple-color="dark"
-                    data-mdb-toggle="modal"
-                    data-mdb-target="#create-board-modal">
-                <i class="fas fa-clipboard-list fa-lg"></i> Create Board
-            </button>
-            <button id="add-members-btn"
-                    type="button"
-                    class="btn btn-outline-dark btn-rounded ms-1"
-                    data-mdb-ripple-color="dark"
-                    data-mdb-toggle="modal"
-                    data-mdb-target="#add-members-modal">
-                <i class="fas fa-user fa-lg"></i> Add Members
-            </button>
-            <a href="/documents?o=${organization.organizationHash}"
-               role="button"
-               class="btn btn-outline-dark btn-rounded ms-1"
-            >
-                <i class="fas fa-file-alt fa-lg"></i> Organization Wiki
-            </a>
-            <button id="remove-organization-btn"
-                    type="button"
-                    class="btn btn-outline-danger btn-rounded ms-3">
-                <i class="fas fa-recycle fa-lg"></i>
-            </button>
+        <div class="d-flex flex-column">
+            <div class="d-flex flex-row">
+                <button id="create-board-btn"
+                        type="button"
+                        class="btn btn-outline-dark btn-rounded"
+                        data-mdb-ripple-color="dark"
+                        data-mdb-toggle="modal"
+                        data-mdb-target="#create-board-modal">
+                    <i class="fas fa-clipboard-list fa-lg"></i> Create Board
+                </button>
+                <button id="add-members-btn"
+                        type="button"
+                        class="btn btn-outline-dark btn-rounded ms-1"
+                        data-mdb-ripple-color="dark"
+                        data-mdb-toggle="modal"
+                        data-mdb-target="#add-members-modal">
+                    <i class="fas fa-user fa-lg"></i> Add Members
+                </button>
+                <button id="remove-organization-btn"
+                        type="button"
+                        class="btn btn-outline-danger btn-rounded ms-3">
+                    <i class="fas fa-recycle fa-lg"></i>
+                </button>
+            </div>
+            <div class="d-flex flex-row mt-1">
+                <a href="/documents?o=${organization.organizationHash}"
+                   role="button"
+                   class="btn btn-outline-primary ms-1"
+                >
+                    <i class="fas fa-file-alt fa-lg"></i> Organization Wiki
+                </a>
+                <a href="/absences?o=${organization.organizationHash}"
+                   role="button"
+                   class="btn btn-outline-primary ms-1"
+                >
+                    <i class="fas fa-coffee fa-lg"></i> Absence History
+                </a>
+                <a href="/absences/chart?o=${organization.organizationHash}"
+                   role="button"
+                   class="btn btn-outline-primary ms-1"
+                >
+                    <i class="fas fa-chart-area fa-lg"></i> Capacity Chart
+                </a>
+                <a href="/absences/manage?o=${organization.organizationHash}"
+                   role="button"
+                   class="manage-absences-btn btn btn-outline-info btn-rounded ms-5"
+                >
+                    <i class="fas fa-thumbs-up"></i> Manage Absences
+                </a>
+            </div>
         </div>
     </div>
 </div>

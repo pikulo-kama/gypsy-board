@@ -228,3 +228,18 @@ html::-webkit-scrollbar-thumb {
 .scrollbar-rare-wind {
     scrollbar-color: #a8edea #F5F5F5;
 }
+
+.select-box {
+    background: var(--third-color);
+    color: var(--forth-color);
+}
+
+.select-box option {
+    background: var(--third-color);
+    color: var(--forth-color);
+}
+
+.select-box option {
+    background: var(--third-color);
+    color: var(--forth-color);
+}

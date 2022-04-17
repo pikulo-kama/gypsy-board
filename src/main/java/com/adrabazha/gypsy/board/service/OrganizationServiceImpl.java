@@ -186,7 +186,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Override
     public Boolean isUserInOrganization(User user, Organization organization) {
-        List<String> organizationUsers = organization.getUsers().stream()
+        List<String> organizationUsers = organization.getMembers().stream()
                 .map(User::getUsername)
                 .collect(Collectors.toList());
 
@@ -211,7 +211,7 @@ public class OrganizationServiceImpl implements OrganizationService {
         }
 
         OrganizationResponse organizationResponse = organizationMapper.mapOrganizationToResponse(organization);
-        List<UserReferenceResponse> members = organization.getUsers().stream().map(user ->
+        List<UserReferenceResponse> members = organization.getMembers().stream().map(user ->
                 UserReferenceResponse.builder()
                         .userHash(userHashResolver.obtainHash(user.getUserId()))
                         .fullName(user.getFullName())
