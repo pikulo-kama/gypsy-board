@@ -1,10 +1,10 @@
 package com.adrabazha.gypsy.board.listener;
 
-import com.adrabazha.gypsy.board.token.domain.RegistrationToken;
 import com.adrabazha.gypsy.board.dto.MailMessage;
-import com.adrabazha.gypsy.board.token.context.RegistrationTokenContext;
 import com.adrabazha.gypsy.board.event.RegistrationCompletedEvent;
 import com.adrabazha.gypsy.board.service.MailService;
+import com.adrabazha.gypsy.board.token.context.RegistrationTokenContext;
+import com.adrabazha.gypsy.board.token.domain.RegistrationToken;
 import com.adrabazha.gypsy.board.token.service.RegistrationTokenService;
 import com.adrabazha.gypsy.board.utils.HttpUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,22 +12,18 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 @Component
-public class OnRegistrationCompletedEventListener implements ApplicationListener<RegistrationCompletedEvent> {
+public class OnRegistrationCompletedListener implements ApplicationListener<RegistrationCompletedEvent> {
 
     private final MailService mailService;
     private final RegistrationTokenService registrationTokenService;
-    private final ExecutorService executorService;
 
     @Autowired
-    public OnRegistrationCompletedEventListener(MailService mailService,
-                                                RegistrationTokenService registrationTokenService) {
+    public OnRegistrationCompletedListener(MailService mailService,
+                                           RegistrationTokenService registrationTokenService) {
         this.mailService = mailService;
         this.registrationTokenService = registrationTokenService;
-        this.executorService = Executors.newCachedThreadPool();
     }
 
     @Override
@@ -36,7 +32,7 @@ public class OnRegistrationCompletedEventListener implements ApplicationListener
                 .user(event.getUser())
                 .build();
         RegistrationToken token = registrationTokenService.createToken(context);
-        executorService.submit(() -> sendMessage(event, token));
+        sendMessage(event, token);
     }
 
     private void sendMessage(RegistrationCompletedEvent event, RegistrationToken token) {
@@ -50,6 +46,6 @@ public class OnRegistrationCompletedEventListener implements ApplicationListener
                 ).build();
 
         mailMessage.setSubject("Please confirm your email address");
-        mailService.sendMessage(mailMessage);
+        mailService.sendMessageAsync(mailMessage);
     }
 }

@@ -20,13 +20,13 @@ import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api/v1/documents")
-public class OrganizationDocumentRestController {
+public class DocumentRestController {
 
     private final OrganizationDocumentService organizationDocumentService;
     private final SessionService sessionService;
 
-    public OrganizationDocumentRestController(OrganizationDocumentService organizationDocumentService,
-                                              SessionService sessionService) {
+    public DocumentRestController(OrganizationDocumentService organizationDocumentService,
+                                  SessionService sessionService) {
         this.organizationDocumentService = organizationDocumentService;
         this.sessionService = sessionService;
     }
@@ -45,12 +45,14 @@ public class OrganizationDocumentRestController {
     }
 
     @PostMapping("/update")
-    public UserMessage updateOrganizationDocument(@Validated @RequestBody DocumentUpdateForm documentUpdateForm) {
-        return organizationDocumentService.updateDocument(documentUpdateForm);
+    public UserMessage updateOrganizationDocument(@Validated @RequestBody DocumentUpdateForm documentUpdateForm,
+                                                  @AuthenticationPrincipal User currentUser) {
+        return organizationDocumentService.updateDocument(documentUpdateForm, currentUser);
     }
 
     @PostMapping("/delete")
-    public UserMessage deleteOrganizationDocument(@RequestParam("doc") String documentHash) {
-        return organizationDocumentService.deleteDocument(documentHash);
+    public UserMessage deleteOrganizationDocument(@RequestParam("doc") String documentHash,
+                                                  @AuthenticationPrincipal User currentUser) {
+        return organizationDocumentService.deleteDocument(documentHash, currentUser);
     }
 }

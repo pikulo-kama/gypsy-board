@@ -8,7 +8,7 @@
         <a role="button" id="remove-board-btn" class="fg-forth hover-fg-sub bg-third me-1 p-2 rounded">
             <i class="fas fa-recycle fa-2x"></i>
         </a>
-        <p class="board-name-field fs-3 fg-third bg-forth p-1 m-0" id="${board.boardHash}" contenteditable="true">${board.boardName?upper_case}</p>
+        <p class="board-name-field fs-3 fg-third bg-forth p-1 m-0" id="${board.boardHash}" contenteditable="true">${board.boardName}</p>
     </div>
     <div id="board-columns-placeholder" class="d-flex flex-row h-100 align-self-start scrollbar scrollbar-x scrollbar-rare-wind"
          style="width: 85%">

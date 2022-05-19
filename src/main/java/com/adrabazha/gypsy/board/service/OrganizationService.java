@@ -1,7 +1,7 @@
 package com.adrabazha.gypsy.board.service;
 
 import com.adrabazha.gypsy.board.domain.sql.Organization;
-import com.adrabazha.gypsy.board.domain.OrganizationRole;
+import com.adrabazha.gypsy.board.domain.sql.OrganizationRole;
 import com.adrabazha.gypsy.board.domain.sql.User;
 import com.adrabazha.gypsy.board.dto.UserMessage;
 import com.adrabazha.gypsy.board.dto.form.OrganizationForm;
@@ -21,7 +21,7 @@ public interface OrganizationService {
 
     UserMessage createOrganization(OrganizationForm organizationForm, User currentUser, HttpServletRequest request);
 
-    UserMessage deleteOrganization(String organizationHash);
+    UserMessage deleteOrganization(String organizationHash, User currentUser);
 
     Boolean isUserInOrganization(User user, Organization organization);
 
@@ -37,9 +37,10 @@ public interface OrganizationService {
 
     List<OrganizationRole> getOrganizationRoles();
 
-    UserMessage updateMemberRole(UpdateMemberRoleForm form, Long organizationId);
+    UserMessage updateMemberRole(UpdateMemberRoleForm form, Long organizationId, User currentUser);
 
-    UserMessage addMembersToOrganization(OrganizationMembersForm form, Long organizationIdm, HttpServletRequest request);
+    UserMessage addMembersToOrganization(OrganizationMembersForm form, Long organizationIdm,
+                                         HttpServletRequest request, User currentUser);
 
-    UserMessage removeOrganizationMember(OrganizationMemberForm form, Long organizationId);
+    UserMessage removeOrganizationMember(OrganizationMemberForm form, Long organizationId, User currentUser);
 }

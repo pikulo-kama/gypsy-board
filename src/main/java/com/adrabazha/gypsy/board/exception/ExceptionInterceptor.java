@@ -14,16 +14,6 @@ import static com.adrabazha.gypsy.board.dto.UserMessage.ERROR_FLASH_ATTRIBUTE;
 @ControllerAdvice
 public class ExceptionInterceptor {
 
-//    @ExceptionHandler(UserMessageException.class)
-    public String handleUserMessageException(UserMessageException exception,
-                                             RedirectAttributes attributes,
-                                             HttpServletRequest request) {
-
-
-        attributes.addFlashAttribute(ERROR_FLASH_ATTRIBUTE, UserMessage.error(exception.getMessage()));
-        return getRedirectUrl(request);
-    }
-
     @ExceptionHandler(BindException.class)
     public String handleBindException(BindException exception, RedirectAttributes attributes, HttpServletRequest request) {
         if (exception.getFieldErrorCount() == 0) {

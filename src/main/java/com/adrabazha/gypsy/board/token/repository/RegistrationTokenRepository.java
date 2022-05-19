@@ -12,5 +12,5 @@ public interface RegistrationTokenRepository extends JpaRepository<RegistrationT
 
     Optional<RegistrationToken> getByToken(@NotNull String token);
 
-    List<RegistrationToken> getRegistrationTokensByExpiryDateBefore(@NotNull Date expiryDate);
+    List<RegistrationToken> getAllByExpiryDateBefore(@NotNull Date expiryDate);
 }

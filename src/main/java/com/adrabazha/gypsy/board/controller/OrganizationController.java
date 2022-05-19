@@ -66,8 +66,7 @@ public class OrganizationController {
     @GetMapping("/acceptInvitation")
     public String acceptInvitation(@RequestParam("token") String token) {
         Boolean isValid = membershipTokenService.validate(token);
-        String returnPage = isValid ? "/login" : "/error";
-        return "redirect:" + returnPage;
+        return "redirect:" + (isValid ? "/login" : "/error");
     }
 
 }

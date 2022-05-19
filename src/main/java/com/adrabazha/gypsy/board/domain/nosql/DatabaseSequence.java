@@ -1,5 +1,6 @@
 package com.adrabazha.gypsy.board.domain.nosql;
 
+import com.adrabazha.gypsy.board.domain.DatabaseEntityConstant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,7 +12,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 @Data
 @Builder
-@Document(collection = "database_sequences")
+@Document(collection = DatabaseEntityConstant.MONGO_SEQUENCES)
 public class DatabaseSequence {
 
     @Id

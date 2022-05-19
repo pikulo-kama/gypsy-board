@@ -1,3 +1,5 @@
+-- Add cascade delete for these columns
+
 ALTER TABLE user_organization
 DROP CONSTRAINT user_organization_organization_id_fkey,
     ADD CONSTRAINT user_organization_organization_id_fkey

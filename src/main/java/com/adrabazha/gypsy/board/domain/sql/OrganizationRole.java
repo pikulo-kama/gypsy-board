@@ -1,5 +1,7 @@
-package com.adrabazha.gypsy.board.domain;
+package com.adrabazha.gypsy.board.domain.sql;
 
+import com.adrabazha.gypsy.board.domain.PrimaryKeyConstant;
+import com.adrabazha.gypsy.board.domain.DatabaseEntityConstant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,11 +19,11 @@ import javax.persistence.Table;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = Tables.ORGANIZATION_ROLE)
+@Table(name = DatabaseEntityConstant.ORGANIZATION_ROLE)
 public class OrganizationRole {
 
     @Id
-    @Column(name = PrimaryKeys.ORGANIZATION_ROLE)
+    @Column(name = PrimaryKeyConstant.ORGANIZATION_ROLE)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long roleId;
 

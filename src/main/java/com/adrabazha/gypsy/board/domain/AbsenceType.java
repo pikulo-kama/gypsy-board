@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum AbsenceType {
+
     SICKNESS("Sickness", "<i class=\"fas fa-head-side-virus\"></i>"),
     VACATION("Vacation", "<i class=\"fas fa-plane-departure\"></i>");
 

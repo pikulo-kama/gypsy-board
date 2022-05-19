@@ -13,20 +13,17 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 @Component
-public class OnNewMembersAddedEventListener implements ApplicationListener<NewMembersAddedEvent> {
+public class OnNewMembersAddedListener implements ApplicationListener<NewMembersAddedEvent> {
 
     private final MailService mailService;
     private final MembershipTokenService membershipTokenService;
-    private final ExecutorService executorService;
 
-    public OnNewMembersAddedEventListener(MailService mailService, MembershipTokenService membershipTokenService) {
+    public OnNewMembersAddedListener(MailService mailService,
+                                     MembershipTokenService membershipTokenService) {
         this.mailService = mailService;
         this.membershipTokenService = membershipTokenService;
-        this.executorService = Executors.newCachedThreadPool();
     }
 
     @Override
@@ -41,8 +38,7 @@ public class OnNewMembersAddedEventListener implements ApplicationListener<NewMe
         event.getNewMembers().forEach(member -> {
             context.setUserId(member.getUserId());
             MembershipToken token = membershipTokenService.createToken(context);
-            executorService.submit(() ->
-                    sendInvitation(member, event.getOrganization(), token, baseUrl));
+            sendInvitation(member, event.getOrganization(), token, baseUrl);
         });
     }
 
@@ -57,6 +53,6 @@ public class OnNewMembersAddedEventListener implements ApplicationListener<NewMe
                 )).build();
 
         message.setSubject(String.format("Invitation to '%s'", organization.getOrganizationName()));
-        mailService.sendMessage(message);
+        mailService.sendMessageAsync(message);
     }
 }

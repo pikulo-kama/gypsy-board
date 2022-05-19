@@ -11,9 +11,9 @@ public interface OrganizationDocumentService {
 
     UserMessage createDocument(DocumentCreateForm documentCreateForm, Long organizationId, User currentUser);
 
-    UserMessage updateDocument(DocumentUpdateForm documentUpdateForm);
+    UserMessage updateDocument(DocumentUpdateForm documentUpdateForm, User currentUser);
 
-    UserMessage deleteDocument(String documentHash);
+    UserMessage deleteDocument(String documentHash, User currentUser);
 
     UserMessage getSpecificDocument(String documentHash);
 }

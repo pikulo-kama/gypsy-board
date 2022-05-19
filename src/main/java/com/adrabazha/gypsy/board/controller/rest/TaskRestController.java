@@ -1,5 +1,6 @@
 package com.adrabazha.gypsy.board.controller.rest;
 
+import com.adrabazha.gypsy.board.domain.sql.User;
 import com.adrabazha.gypsy.board.dto.form.ColumnSynchronizationForm;
 import com.adrabazha.gypsy.board.dto.form.TaskCreateForm;
 import com.adrabazha.gypsy.board.dto.form.TaskUpdateForm;
@@ -8,6 +9,7 @@ import com.adrabazha.gypsy.board.dto.response.TaskResponse;
 import com.adrabazha.gypsy.board.service.TaskService;
 import com.adrabazha.gypsy.board.utils.resolver.TaskHashResolver;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -43,13 +45,14 @@ public class TaskRestController {
     }
 
     @PostMapping("/create")
-    public TaskReferenceResponse createTask(@Valid @RequestBody TaskCreateForm taskForm) {
-        return taskService.createTask(taskForm);
+    public TaskReferenceResponse createTask(@Valid @RequestBody TaskCreateForm taskForm,
+                                            @AuthenticationPrincipal User currentUser) {
+        return taskService.createTask(taskForm, currentUser);
     }
 
     @PostMapping("/update")
-    public void updateTask(@Valid @RequestBody TaskUpdateForm taskForm) {
-        taskService.updateTask(taskForm);
+    public void updateTask(@Valid @RequestBody TaskUpdateForm taskForm, @AuthenticationPrincipal User currentUser) {
+        taskService.updateTask(taskForm, currentUser);
     }
 
     @PostMapping("/sync")

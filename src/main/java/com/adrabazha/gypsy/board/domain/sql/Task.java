@@ -1,8 +1,7 @@
 package com.adrabazha.gypsy.board.domain.sql;
 
-import com.adrabazha.gypsy.board.domain.Comment;
-import com.adrabazha.gypsy.board.domain.PrimaryKeys;
-import com.adrabazha.gypsy.board.domain.Tables;
+import com.adrabazha.gypsy.board.domain.PrimaryKeyConstant;
+import com.adrabazha.gypsy.board.domain.DatabaseEntityConstant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,21 +16,19 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
-import java.util.List;
 
 @Builder(toBuilder = true)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = Tables.TASK)
+@Table(name = DatabaseEntityConstant.TASK)
 public class Task {
 
     @Id
-    @Column(name = PrimaryKeys.TASK)
+    @Column(name = PrimaryKeyConstant.TASK)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long taskId;
 
@@ -52,8 +49,4 @@ public class Task {
     private BoardColumn boardColumn;
 
     private String taskDescription;
-
-    @OneToMany(mappedBy = "task", fetch = FetchType.LAZY)
-    @ToString.Exclude
-    private List<Comment> comments;
 }

@@ -15,7 +15,7 @@ public interface AbsenceService {
 
     UserMessage getOrganizationAbsenceRequests(String organizationHash);
 
-    UserMessage approveAbsenceRequest(String absenceRecordHash);
+    UserMessage approveAbsenceRequest(String absenceRecordHash, User currentUser);
 
     UserMessage generateCapacityChart(CapacityChartForm capacityChartForm, Long organizationId);
 }

@@ -5,6 +5,7 @@ import com.adrabazha.gypsy.board.token.domain.RegistrationToken;
 import com.adrabazha.gypsy.board.token.context.RegistrationTokenContext;
 import com.adrabazha.gypsy.board.token.repository.RegistrationTokenRepository;
 import com.adrabazha.gypsy.board.service.UserService;
+import com.adrabazha.gypsy.board.utils.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -38,7 +39,7 @@ public class RegistrationTokenServiceImpl implements RegistrationTokenService {
         }
 
         RegistrationToken tokenUnwrapped = registrationToken.get();
-        if (isExpired(tokenUnwrapped)) {
+        if (TokenUtils.isExpired(tokenUnwrapped)) {
             return false;
         }
 
@@ -54,7 +55,7 @@ public class RegistrationTokenServiceImpl implements RegistrationTokenService {
     public RegistrationToken createToken(RegistrationTokenContext context) {
         RegistrationToken token = RegistrationToken.builder()
                 .token(UUID.randomUUID().toString())
-                .expiryDate(getExpiryDate(tokenLifetimeHours))
+                .expiryDate(TokenUtils.getExpiryDate(tokenLifetimeHours))
                 .user(context.getUser())
                 .build();
 
@@ -63,16 +64,12 @@ public class RegistrationTokenServiceImpl implements RegistrationTokenService {
 
     @Override
     public void cleanExpiredTokens() {
-        List<RegistrationToken> expiredTokens = getExpiredTokens();
+        List<RegistrationToken> expiredTokens = registrationTokenRepository.getAllByExpiryDateBefore(new Date());
         List<User> usersToDelete = expiredTokens.stream()
                 .map(RegistrationToken::getUser)
                 .collect(Collectors.toList());
 
         userService.deleteUsers(usersToDelete);
         registrationTokenRepository.deleteAll(expiredTokens);
-    }
-
-    private List<RegistrationToken> getExpiredTokens() {
-        return registrationTokenRepository.getRegistrationTokensByExpiryDateBefore(new Date());
     }
 }

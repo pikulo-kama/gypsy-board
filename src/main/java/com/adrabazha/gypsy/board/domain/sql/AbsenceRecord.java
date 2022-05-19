@@ -1,8 +1,8 @@
 package com.adrabazha.gypsy.board.domain.sql;
 
 import com.adrabazha.gypsy.board.domain.AbsenceType;
-import com.adrabazha.gypsy.board.domain.PrimaryKeys;
-import com.adrabazha.gypsy.board.domain.Tables;
+import com.adrabazha.gypsy.board.domain.PrimaryKeyConstant;
+import com.adrabazha.gypsy.board.domain.DatabaseEntityConstant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,11 +26,11 @@ import java.util.Date;
 @Data
 @Builder
 @Entity
-@Table(name = Tables.ABSENCE_RECORD)
+@Table(name = DatabaseEntityConstant.ABSENCE_RECORD)
 public class AbsenceRecord {
 
     @Id
-    @Column(name = PrimaryKeys.ABSENCE_RECORD)
+    @Column(name = PrimaryKeyConstant.ABSENCE_RECORD)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long absenceId;
 

@@ -1,8 +1,8 @@
 package com.adrabazha.gypsy.board.service;
 
-import com.adrabazha.gypsy.board.domain.sql.Organization;
-import com.adrabazha.gypsy.board.domain.OrganizationRole;
 import com.adrabazha.gypsy.board.domain.Role;
+import com.adrabazha.gypsy.board.domain.sql.Organization;
+import com.adrabazha.gypsy.board.domain.sql.OrganizationRole;
 import com.adrabazha.gypsy.board.domain.sql.User;
 import com.adrabazha.gypsy.board.dto.UserMessage;
 import com.adrabazha.gypsy.board.dto.form.OrganizationForm;
@@ -20,6 +20,8 @@ import com.adrabazha.gypsy.board.mapper.OrganizationMapper;
 import com.adrabazha.gypsy.board.mapper.UserMapper;
 import com.adrabazha.gypsy.board.repository.OrganizationRepository;
 import com.adrabazha.gypsy.board.repository.OrganizationRoleRepository;
+import com.adrabazha.gypsy.board.utils.mail.CustomEventPublisher;
+import com.adrabazha.gypsy.board.utils.mail.templates.MessageTemplates;
 import com.adrabazha.gypsy.board.utils.resolver.OrganizationHashResolver;
 import com.adrabazha.gypsy.board.utils.resolver.UserHashResolver;
 import org.apache.commons.lang3.StringUtils;
@@ -45,7 +47,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     private final UserService userService;
     private final UserMapper userMapper;
     private final UserHashResolver userHashResolver;
-    private final ApplicationEventPublisher eventPublisher;
+    private final CustomEventPublisher eventPublisher;
 
     @Autowired
     public OrganizationServiceImpl(OrganizationRepository organizationRepository,
@@ -55,7 +57,7 @@ public class OrganizationServiceImpl implements OrganizationService {
                                    UserService userService,
                                    UserMapper userMapper,
                                    UserHashResolver userHashResolver,
-                                   ApplicationEventPublisher eventPublisher) {
+                                   CustomEventPublisher eventPublisher) {
         this.organizationRepository = organizationRepository;
         this.organizationRoleRepository = organizationRoleRepository;
         this.organizationMapper = organizationMapper;
@@ -79,7 +81,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Override
     @Transactional
-    public UserMessage updateMemberRole(UpdateMemberRoleForm form, Long organizationId) {
+    public UserMessage updateMemberRole(UpdateMemberRoleForm form, Long organizationId, User currentUser) {
         Long userId = userHashResolver.retrieveIdentifier(form.getUserHash());
         String userCurrentRole = organizationRepository.getOrganizationMemberRole(userId, organizationId);
         UserMessage userMessage;
@@ -91,6 +93,13 @@ public class OrganizationServiceImpl implements OrganizationService {
             OrganizationRole newUserRole = organizationRoleRepository.findByRoleCode(form.getRoleCode());
             organizationRepository.updateUserRoleInOrganization(userId, organizationId, newUserRole.getRoleId());
             userCurrentRole = newUserRole.getRoleCode();
+
+            eventPublisher.publishMemberRelatedEvent(
+                    this,
+                    findById(organizationId),
+                    userService.findById(userId),
+                    currentUser,
+                    MessageTemplates.memberRoleWasUpdated(newUserRole));
 
             userMessage = UserMessage.success("Successfully changed role");
         }
@@ -121,7 +130,7 @@ public class OrganizationServiceImpl implements OrganizationService {
         this.addUsersToOrganization(Collections.singletonList(currentUser), persistedOrganization, adminRole.getRoleId(), true);
         this.addUsersToOrganization(members, persistedOrganization, standardRole.getRoleId(), false);
 
-        triggerNewMembersAddedEvent(request, persistedOrganization, members);
+        triggerNewMembersAddedEvent(request, persistedOrganization, members, currentUser);
 
         UserMessage userMessage = UserMessage.success("Organizations was created");
         userMessage.addResponseDataEntry("persistedOrganization",
@@ -131,14 +140,15 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Override
     @Transactional
-    public UserMessage addMembersToOrganization(OrganizationMembersForm form, Long organizationId, HttpServletRequest request) {
+    public UserMessage addMembersToOrganization(OrganizationMembersForm form, Long organizationId,
+                                                HttpServletRequest request, User currentUser) {
         Organization organization = findById(organizationId);
         List<User> newMembers = userService.findUsersByUsernames(form.getOrganizationMembers());
         OrganizationRole defaultRole = organizationRoleRepository.findByRoleCode(Role.STANDARD.getRoleName());
 
         this.addUsersToOrganization(newMembers, organization, defaultRole.getRoleId(), false);
 
-        triggerNewMembersAddedEvent(request, organization, newMembers);
+        triggerNewMembersAddedEvent(request, organization, newMembers, currentUser);
 
         List<UserReferenceResponse> memberReferences = newMembers.stream()
                 .map(userMapper::mapUserToReferenceResponse)
@@ -157,16 +167,28 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Override
     @Transactional
-    public UserMessage removeOrganizationMember(OrganizationMemberForm form, Long organizationId) {
+    public UserMessage removeOrganizationMember(OrganizationMemberForm form, Long organizationId, User currentUser) {
         Long userId = userHashResolver.retrieveIdentifier(form.getMemberHash());
         UserMessage message;
 
         String memberRole = getOrganizationMemberRole(userId, organizationId);
-            if (isLastAdminInOrganization(organizationId, memberRole)) {
+        if (isLastAdminInOrganization(organizationId, memberRole)) {
             message = UserMessage.error("Can't remove last admin in organization");
         } else {
             User memberToRemove = userService.findById(userId);
             organizationRepository.deleteConcreteUserFromOrganization(organizationId, memberToRemove.getUserId());
+            Organization organization = findById(organizationId);
+
+            eventPublisher.publishMemberRelatedEvent(this,
+                    organization,
+                    memberToRemove,
+                    currentUser,
+                    MessageTemplates.memberWasRemovedFromOrganization());
+
+            eventPublisher.publishOrganizationRelatedEvent(this,
+                    organization,
+                    currentUser,
+                    MessageTemplates.memberWasRemovedFromOrganization(memberToRemove));
 
             message = UserMessage.success(String.format("Member '%s' was removed from organization", memberToRemove.getFullName()));
             message.addResponseDataEntry("removedMemberHash", form.getMemberHash());
@@ -177,16 +199,21 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Override
     @Transactional
-    public UserMessage deleteOrganization(String organizationHash) {
+    public UserMessage deleteOrganization(String organizationHash, User currentUser) {
         Long organizationId = organizationHashResolver.retrieveIdentifier(organizationHash);
-        organizationRepository.deleteUsersFromOrganization(organizationId);
-        organizationRepository.deleteById(organizationId);
+        Organization organization = findById(organizationId);
+        organizationRepository.deleteUsersFromOrganization(organization.getOrganizationId());
+        organizationRepository.deleteById(organization.getOrganizationId());
+
+        eventPublisher.publishOrganizationRelatedEvent(this, organization,
+                currentUser, MessageTemplates.organizationDeleted());
+
         return UserMessage.success("Organization was deleted");
     }
 
     @Override
     public Boolean isUserInOrganization(User user, Organization organization) {
-        List<String> organizationUsers = organization.getMembers().stream()
+        List<String> organizationUsers = organization.getActiveMembers().stream()
                 .map(User::getUsername)
                 .collect(Collectors.toList());
 
@@ -211,7 +238,7 @@ public class OrganizationServiceImpl implements OrganizationService {
         }
 
         OrganizationResponse organizationResponse = organizationMapper.mapOrganizationToResponse(organization);
-        List<UserReferenceResponse> members = organization.getMembers().stream().map(user ->
+        List<UserReferenceResponse> members = organization.getAllMembers().stream().map(user ->
                 UserReferenceResponse.builder()
                         .userHash(userHashResolver.obtainHash(user.getUserId()))
                         .fullName(user.getFullName())
@@ -253,9 +280,13 @@ public class OrganizationServiceImpl implements OrganizationService {
         return Objects.equals(Role.fromRoleName(userCurrentRole), Role.ADMIN) && organizationRepository.getAdminCountInOrganization(organizationId) == 1;
     }
 
-    private void triggerNewMembersAddedEvent(HttpServletRequest request, Organization organization, List<User> members) {
-        NewMembersAddedEvent event = new NewMembersAddedEvent(this, members, organization, request);
-        eventPublisher.publishEvent(event);
+    private void triggerNewMembersAddedEvent(HttpServletRequest request, Organization organization, List<User> members, User memberPerformed) {
+        eventPublisher.publishNewMembersAddedEvent(this, members, organization, request);
+        members.forEach(member -> eventPublisher.publishOrganizationRelatedEvent(
+                this,
+                organization,
+                memberPerformed,
+                MessageTemplates.memberWasInvitedToOrganization(member)));
     }
 
     private void addUsersToOrganization(List<User> users, Organization organization, Long roleId, Boolean isInvitationAccepted) {
