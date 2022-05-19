@@ -13,6 +13,8 @@ import com.adrabazha.gypsy.board.exception.GeneralException;
 import com.adrabazha.gypsy.board.exception.UserMessageException;
 import com.adrabazha.gypsy.board.mapper.AbsenceRecordMapper;
 import com.adrabazha.gypsy.board.repository.AbsenceRecordRepository;
+import com.adrabazha.gypsy.board.utils.mail.CustomEventPublisher;
+import com.adrabazha.gypsy.board.utils.mail.templates.MessageTemplates;
 import com.adrabazha.gypsy.board.utils.resolver.AbsenceRecordHashResolver;
 import com.adrabazha.gypsy.board.utils.resolver.OrganizationHashResolver;
 import org.springframework.stereotype.Service;
@@ -33,28 +35,31 @@ public class AbsenceServiceImpl implements AbsenceService {
     private final AbsenceRecordRepository absenceRecordRepository;
     private final AbsenceRecordMapper absenceRecordMapper;
     private final AbsenceRecordHashResolver absenceRecordHashResolver;
+    private final CustomEventPublisher eventPublisher;
 
     public AbsenceServiceImpl(OrganizationService organizationService,
                               OrganizationHashResolver organizationHashResolver,
                               AbsenceRecordRepository absenceRecordRepository,
                               AbsenceRecordMapper absenceRecordMapper,
-                              AbsenceRecordHashResolver absenceRecordHashResolver) {
+                              AbsenceRecordHashResolver absenceRecordHashResolver,
+                              CustomEventPublisher eventPublisher) {
         this.organizationService = organizationService;
         this.organizationHashResolver = organizationHashResolver;
         this.absenceRecordRepository = absenceRecordRepository;
         this.absenceRecordMapper = absenceRecordMapper;
         this.absenceRecordHashResolver = absenceRecordHashResolver;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
-    public UserMessage createAbsenceRequest(AbsenceRequestForm form, Long organizationId, User user) {
+    public UserMessage createAbsenceRequest(AbsenceRequestForm form, Long organizationId, User currentUser) {
         Organization organization = organizationService.findById(organizationId);
 
         if (isRequestFormInvalid(form)) {
             throw new UserMessageException("Invalid absence period specified");
         }
 
-        if (isAbsenceAlreadyRequested(form, organization, user)) {
+        if (isAbsenceAlreadyRequested(form, organization, currentUser)) {
             throw new UserMessageException("You already have absence requested on this date");
         }
 
@@ -64,11 +69,14 @@ public class AbsenceServiceImpl implements AbsenceService {
                 .absenceType(form.getAbsenceType())
                 .isCancelled(false)
                 .isApproved(false)
-                .member(user)
+                .member(currentUser)
                 .organization(organization)
                 .build();
 
         AbsenceRecord createdRecord = absenceRecordRepository.save(absenceRecord);
+
+        eventPublisher.publishOrganizationRelatedEvent(this, organization, currentUser,
+                MessageTemplates.memberRequestedAbsence(createdRecord));
 
         UserMessage userMessage = UserMessage.success("Absence was requested");
         userMessage.addResponseDataEntry("createdRecord", absenceRecordMapper.mapToAbsenceResponse(createdRecord));
@@ -102,7 +110,13 @@ public class AbsenceServiceImpl implements AbsenceService {
 
         validate(absenceRecord, currentUser, organizationId);
 
-        absenceRecordRepository.save(absenceRecord);
+        AbsenceRecord updatedRecord = absenceRecordRepository.save(absenceRecord);
+
+        eventPublisher.publishOrganizationRelatedEvent(this,
+                updatedRecord.getOrganization(),
+                currentUser,
+                MessageTemplates.memberCancelledAbsence(updatedRecord));
+
         return UserMessage.success("Request was successfully canceled");
     }
 
@@ -125,11 +139,16 @@ public class AbsenceServiceImpl implements AbsenceService {
     }
 
     @Override
-    public UserMessage approveAbsenceRequest(String absenceRecordHash) {
+    public UserMessage approveAbsenceRequest(String absenceRecordHash, User currentUser) {
         Long absenceRecordId = absenceRecordHashResolver.retrieveIdentifier(absenceRecordHash);
         AbsenceRecord absenceRecord = findById(absenceRecordId);
         absenceRecord.setIsApproved(true);
-        absenceRecordRepository.save(absenceRecord);
+        AbsenceRecord updatedRecord = absenceRecordRepository.save(absenceRecord);
+
+        eventPublisher.publishOrganizationRelatedEvent(this,
+                updatedRecord.getOrganization(),
+                currentUser,
+                MessageTemplates.memberAbsenceRequestWasApproved(updatedRecord));
 
         return UserMessage.success("Absence request was successfully approved");
     }
@@ -142,7 +161,7 @@ public class AbsenceServiceImpl implements AbsenceService {
 
         ChartResponse chart = new ChartResponse();
 
-        int membersSize = organization.getMembers().size();
+        int membersSize = organization.getActiveMembers().size();
 
         for (long time = form.getStartDate().getTime(); time <= form.getEndDate().getTime(); time += getOneDayMillis()) {
 
@@ -162,10 +181,9 @@ public class AbsenceServiceImpl implements AbsenceService {
             });
             chart.increaseSectionShare("Available", (double) membersSize - membersAbsent.get());
         }
-        chart.buildResponse();
 
         UserMessage userMessage = UserMessage.success("Chart was generated");
-        userMessage.addResponseDataEntry("chart", chart);
+        userMessage.addResponseDataEntry("chart", chart.buildResponse());
 
         return userMessage;
     }

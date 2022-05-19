@@ -14,9 +14,9 @@ public interface BoardService {
 
     BoardResponse getBoardResponse(String boardHash, User currentUser);
 
-    UserMessage createBoard(BoardCreateForm dto, OrganizationToken token);
+    UserMessage createBoard(BoardCreateForm dto, OrganizationToken token, User currentUser);
 
-    UserMessage updateBoard(BoardUpdateForm dto);
+    UserMessage updateBoard(BoardUpdateForm dto, User currentUser);
 
-    void deleteBoard(String boardHash);
+    UserMessage deleteBoard(String boardHash);
 }

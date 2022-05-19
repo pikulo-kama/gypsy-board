@@ -1,7 +1,7 @@
 package com.adrabazha.gypsy.board.token.domain;
 
-import com.adrabazha.gypsy.board.domain.PrimaryKeys;
-import com.adrabazha.gypsy.board.domain.Tables;
+import com.adrabazha.gypsy.board.domain.PrimaryKeyConstant;
+import com.adrabazha.gypsy.board.domain.DatabaseEntityConstant;
 import com.adrabazha.gypsy.board.domain.sql.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,11 +25,11 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = Tables.REGISTRATION_TOKEN)
-public class RegistrationToken implements Token {
+@Table(name = DatabaseEntityConstant.REGISTRATION_TOKEN)
+public class RegistrationToken implements ApplicationToken {
 
     @Id
-    @Column(name = PrimaryKeys.REGISTRATION_TOKEN)
+    @Column(name = PrimaryKeyConstant.REGISTRATION_TOKEN)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 

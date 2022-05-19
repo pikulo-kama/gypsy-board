@@ -52,16 +52,6 @@ CREATE TABLE "tasks"
     "task_description" VARCHAR
 );
 
-CREATE TABLE "comments"
-(
-    "comment_id"    BIGSERIAL PRIMARY KEY,
-    "body"          VARCHAR(500) NOT NULL,
-    "task_id"       BIGINT,
-    "author_id"     BIGINT,
-    "creation_date" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    "edited"        BOOLEAN   DEFAULT FALSE
-);
-
 ALTER TABLE "boards"
     ADD FOREIGN KEY ("organization_id") REFERENCES "organizations" ("organization_id") ON DELETE CASCADE;
 
@@ -82,9 +72,3 @@ ALTER TABLE "tasks"
 
 ALTER TABLE "tasks"
     ADD FOREIGN KEY ("user_assigned_id") REFERENCES "users" ("user_id") ON DELETE SET NULL;
-
-ALTER TABLE "comments"
-    ADD FOREIGN KEY ("task_id") REFERENCES "tasks" ("task_id") ON DELETE CASCADE;
-
-ALTER TABLE "comments"
-    ADD FOREIGN KEY ("author_id") REFERENCES "users" ("user_id");

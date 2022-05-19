@@ -28,7 +28,7 @@ public class OrganizationMapper {
     }
 
     public OrganizationResponse mapOrganizationToResponse(Organization organization) {
-        List<UserReferenceResponse> members = organization.getMembers().stream()
+        List<UserReferenceResponse> members = organization.getAllMembers().stream()
                 .map(userMapper::mapUserToReferenceResponse)
                 .collect(Collectors.toList());
 

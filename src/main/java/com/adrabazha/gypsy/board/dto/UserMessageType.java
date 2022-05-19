@@ -1,4 +1,4 @@
-package com.adrabazha.gypsy.board.exception;
+package com.adrabazha.gypsy.board.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

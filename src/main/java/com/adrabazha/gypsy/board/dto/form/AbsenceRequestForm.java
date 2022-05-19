@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.Future;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @AllArgsConstructor
@@ -14,9 +16,13 @@ import java.util.Date;
 @Builder
 public class AbsenceRequestForm {
 
+    @NotNull
     private Date startDate;
 
+    @NotNull
+    @Future
     private Date endDate;
 
+    @NotNull
     private AbsenceType absenceType;
 }

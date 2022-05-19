@@ -28,7 +28,9 @@ public class OrganizationAccessAspect {
     private final OrganizationService organizationService;
 
     @Autowired
-    public OrganizationAccessAspect(SessionService sessionService, HttpServletRequest request, OrganizationService organizationService) {
+    public OrganizationAccessAspect(SessionService sessionService,
+                                    HttpServletRequest request,
+                                    OrganizationService organizationService) {
         this.sessionService = sessionService;
         this.request = request;
         this.organizationService = organizationService;

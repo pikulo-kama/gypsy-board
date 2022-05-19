@@ -12,6 +12,8 @@ import com.adrabazha.gypsy.board.dto.response.DocumentResponse;
 import com.adrabazha.gypsy.board.exception.GeneralException;
 import com.adrabazha.gypsy.board.mapper.DocumentMapper;
 import com.adrabazha.gypsy.board.repository.OrganizationDocumentRepository;
+import com.adrabazha.gypsy.board.utils.mail.CustomEventPublisher;
+import com.adrabazha.gypsy.board.utils.mail.templates.MessageTemplates;
 import com.adrabazha.gypsy.board.utils.resolver.DocumentHashResolver;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Update;
@@ -37,19 +39,22 @@ public class OrganizationDocumentServiceImpl implements OrganizationDocumentServ
     private final UserService userService;
     private final OrganizationService organizationService;
     private final MongoOperations mongoOperations;
+    private final CustomEventPublisher eventPublisher;
 
     public OrganizationDocumentServiceImpl(OrganizationDocumentRepository organizationDocumentRepository,
                                            DocumentHashResolver documentHashResolver,
                                            DocumentMapper documentMapper,
                                            UserService userService,
                                            OrganizationService organizationService,
-                                           MongoOperations mongoOperations) {
+                                           MongoOperations mongoOperations, 
+                                           CustomEventPublisher eventPublisher) {
         this.organizationDocumentRepository = organizationDocumentRepository;
         this.documentHashResolver = documentHashResolver;
         this.documentMapper = documentMapper;
         this.userService = userService;
         this.organizationService = organizationService;
         this.mongoOperations = mongoOperations;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -88,7 +93,12 @@ public class OrganizationDocumentServiceImpl implements OrganizationDocumentServ
 
         DocumentReferenceResponse createdDocument = documentMapper.mapDocumentToReferenceResponse(persistedDocument);
         createdDocument.setAuthorName(currentUser.getFullName());
-
+        
+        eventPublisher.publishOrganizationRelatedEvent(this, 
+                organizationService.findById(organizationId), 
+                currentUser, 
+                MessageTemplates.documentWasCreated(persistedDocument));
+        
         UserMessage userMessage = UserMessage.success("Document was created");
         userMessage.addResponseDataEntry("createdDocument", createdDocument);
 
@@ -96,7 +106,7 @@ public class OrganizationDocumentServiceImpl implements OrganizationDocumentServ
     }
 
     @Override
-    public UserMessage updateDocument(DocumentUpdateForm documentUpdateForm) {
+    public UserMessage updateDocument(DocumentUpdateForm documentUpdateForm, User currentUser) {
         Long documentId = documentHashResolver.retrieveIdentifier(documentUpdateForm.getDocumentHash());
         OrganizationDocument document = findById(documentId);
 
@@ -108,6 +118,11 @@ public class OrganizationDocumentServiceImpl implements OrganizationDocumentServ
         OrganizationDocument persistedDocument = organizationDocumentRepository.save(updatedDocument);
         DocumentReferenceResponse documentResponse = documentMapper.mapDocumentToReferenceResponse(persistedDocument);
 
+        eventPublisher.publishOrganizationRelatedEvent(this,
+                organizationService.findById(persistedDocument.getOrganizationId()),
+                currentUser,
+                MessageTemplates.documentWasModified(persistedDocument));
+
         UserMessage userMessage = UserMessage.success("Document was updated");
         userMessage.addResponseDataEntry("updatedDocument", documentResponse);
 
@@ -115,10 +130,17 @@ public class OrganizationDocumentServiceImpl implements OrganizationDocumentServ
     }
 
     @Override
-    public UserMessage deleteDocument(String documentHash) {
+    public UserMessage deleteDocument(String documentHash, User currentUser) {
         Long documentId = documentHashResolver.retrieveIdentifier(documentHash);
+        OrganizationDocument document = findById(documentId);
+        Organization organization = organizationService.findById(document.getOrganizationId());
 
-        organizationDocumentRepository.deleteById(documentId);
+        organizationDocumentRepository.deleteById(document.getDocumentId());
+
+        eventPublisher.publishOrganizationRelatedEvent(this,
+                organization,
+                currentUser,
+                MessageTemplates.documentWasDeleted(document));
 
         UserMessage userMessage = UserMessage.success("Document was removed");
         userMessage.addResponseDataEntry("removedDocumentHash", documentHash);
@@ -144,7 +166,7 @@ public class OrganizationDocumentServiceImpl implements OrganizationDocumentServ
 
     private OrganizationDocument findById(Long documentId) {
         return organizationDocumentRepository.findById(documentId)
-                .orElseThrow(() -> new GeneralException("Attempt to update non-existing document"));
+                .orElseThrow(() -> new GeneralException("Document doesn't exist"));
     }
 
     private Long generateDocumentId() {

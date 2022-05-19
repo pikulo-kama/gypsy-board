@@ -2,12 +2,15 @@ package com.adrabazha.gypsy.board.service;
 
 import com.adrabazha.gypsy.board.domain.sql.Board;
 import com.adrabazha.gypsy.board.domain.sql.BoardColumn;
+import com.adrabazha.gypsy.board.domain.sql.User;
 import com.adrabazha.gypsy.board.dto.UserMessage;
 import com.adrabazha.gypsy.board.dto.form.ColumnCreateForm;
 import com.adrabazha.gypsy.board.dto.form.ColumnUpdateForm;
 import com.adrabazha.gypsy.board.dto.response.BoardColumnReferenceResponse;
 import com.adrabazha.gypsy.board.exception.GeneralException;
 import com.adrabazha.gypsy.board.repository.BoardColumnRepository;
+import com.adrabazha.gypsy.board.utils.mail.CustomEventPublisher;
+import com.adrabazha.gypsy.board.utils.mail.templates.MessageTemplates;
 import com.adrabazha.gypsy.board.utils.resolver.BoardColumnHashResolver;
 import com.adrabazha.gypsy.board.utils.resolver.BoardHashResolver;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,15 +26,19 @@ public class BoardColumnServiceImpl implements BoardColumnService {
     private final BoardHashResolver boardHashResolver;
     private final BoardColumnRepository boardColumnRepository;
     private final BoardColumnHashResolver boardColumnHashResolver;
+    private final CustomEventPublisher eventPublisher;
 
     @Autowired
-    public BoardColumnServiceImpl(BoardService boardService, BoardHashResolver boardHashResolver,
+    public BoardColumnServiceImpl(BoardService boardService,
+                                  BoardHashResolver boardHashResolver,
                                   BoardColumnRepository boardColumnRepository,
-                                  BoardColumnHashResolver boardColumnHashResolver) {
+                                  BoardColumnHashResolver boardColumnHashResolver,
+                                  CustomEventPublisher eventPublisher) {
         this.boardService = boardService;
         this.boardHashResolver = boardHashResolver;
         this.boardColumnRepository = boardColumnRepository;
         this.boardColumnHashResolver = boardColumnHashResolver;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -41,15 +48,20 @@ public class BoardColumnServiceImpl implements BoardColumnService {
     }
 
     @Override
-    public void updateColumnName(ColumnUpdateForm columnUpdateForm) {
+    public void updateColumnName(ColumnUpdateForm columnUpdateForm, User currentUser) {
         Long columnId = boardColumnHashResolver.retrieveIdentifier(columnUpdateForm.getColumnHash());
         BoardColumn boardColumn = findById(columnId);
         boardColumn.setColumnName(columnUpdateForm.getColumnName());
-        boardColumnRepository.save(boardColumn);
+        BoardColumn updatedColumn = boardColumnRepository.save(boardColumn);
+
+        eventPublisher.publishOrganizationRelatedEvent(this,
+                updatedColumn.getBoard().getOrganization(),
+                currentUser,
+                MessageTemplates.columnUpdated(updatedColumn));
     }
 
     @Override
-    public UserMessage createBoardColumn(ColumnCreateForm columnCreateForm) {
+    public UserMessage createBoardColumn(ColumnCreateForm columnCreateForm, User currentUser) {
         Long boardId = boardHashResolver.retrieveIdentifier(columnCreateForm.getBoardHash());
         Board board = boardService.findById(boardId);
         Optional<BoardColumn> lastBoardColumn = board.getBoardColumns().stream()
@@ -66,6 +78,12 @@ public class BoardColumnServiceImpl implements BoardColumnService {
                 .columnOrder(nextColumnPosition)
                 .build();
         BoardColumn persistedBoardColumn = boardColumnRepository.save(boardColumn);
+
+        eventPublisher.publishOrganizationRelatedEvent(this,
+                persistedBoardColumn.getBoard().getOrganization(),
+                currentUser,
+                MessageTemplates.columnCreated(persistedBoardColumn));
+
         UserMessage userMessage = UserMessage.success("Column was added");
         userMessage.addResponseDataEntry("boardColumn", BoardColumnReferenceResponse.builder()
                 .columnHash(boardColumnHashResolver.obtainHash(persistedBoardColumn.getColumnId()))

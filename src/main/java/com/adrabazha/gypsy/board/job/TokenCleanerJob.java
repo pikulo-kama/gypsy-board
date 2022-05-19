@@ -9,13 +9,13 @@ import java.util.List;
 @Component
 public class TokenCleanerJob {
 
-    private final List<TokenService> tokenServiceList;
+    private final List<TokenService<?, ?>> tokenServiceList;
 
-    public TokenCleanerJob(List<TokenService> tokenServiceList) {
+    public TokenCleanerJob(List<TokenService<?, ?>> tokenServiceList) {
         this.tokenServiceList = tokenServiceList;
     }
 
-    @Scheduled(cron = "0 0 12 * * ?")
+    @Scheduled(cron = "@midnight")
     public void dropExpiredTokens() {
         tokenServiceList.forEach(TokenService::cleanExpiredTokens);
     }

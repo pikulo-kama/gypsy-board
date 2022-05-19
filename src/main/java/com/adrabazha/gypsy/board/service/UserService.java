@@ -9,8 +9,6 @@ import java.util.List;
 
 public interface UserService {
 
-    List<User> findAll();
-
     User findById(Long userId);
 
     User save(User user);
@@ -24,8 +22,6 @@ public interface UserService {
     User findUserByUsername(String username);
 
     List<User> findUsersFromOrganization(Organization organization);
-
-    List<User> findUsersFromOrganization(Organization organization, String input);
 
     UserMessage findOrganizationMembersByInput(String input, Long organizationId);
 }

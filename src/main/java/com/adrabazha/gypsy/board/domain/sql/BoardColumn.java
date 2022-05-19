@@ -1,7 +1,7 @@
 package com.adrabazha.gypsy.board.domain.sql;
 
-import com.adrabazha.gypsy.board.domain.PrimaryKeys;
-import com.adrabazha.gypsy.board.domain.Tables;
+import com.adrabazha.gypsy.board.domain.PrimaryKeyConstant;
+import com.adrabazha.gypsy.board.domain.DatabaseEntityConstant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,11 +17,11 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = Tables.BOARD_COLUMN)
+@Table(name = DatabaseEntityConstant.BOARD_COLUMN)
 public class BoardColumn {
 
     @Id
-    @Column(name = PrimaryKeys.BOARD_COLUMN)
+    @Column(name = PrimaryKeyConstant.BOARD_COLUMN)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long columnId;
 

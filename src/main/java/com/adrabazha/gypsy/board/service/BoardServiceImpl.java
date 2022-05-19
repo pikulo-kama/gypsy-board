@@ -13,6 +13,8 @@ import com.adrabazha.gypsy.board.exception.GeneralException;
 import com.adrabazha.gypsy.board.exception.UserMessageException;
 import com.adrabazha.gypsy.board.mapper.BoardMapper;
 import com.adrabazha.gypsy.board.repository.BoardRepository;
+import com.adrabazha.gypsy.board.utils.mail.CustomEventPublisher;
+import com.adrabazha.gypsy.board.utils.mail.templates.MessageTemplates;
 import com.adrabazha.gypsy.board.utils.resolver.BoardHashResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,14 +28,19 @@ public class BoardServiceImpl implements BoardService {
     private final BoardRepository boardRepository;
     private final OrganizationService organizationService;
     private final BoardMapper boardMapper;
+    private final CustomEventPublisher eventPublisher;
 
     @Autowired
-    public BoardServiceImpl(BoardHashResolver boardHashResolver, BoardRepository boardRepository,
-                            OrganizationService organizationService, BoardMapper boardMapper) {
+    public BoardServiceImpl(BoardHashResolver boardHashResolver,
+                            BoardRepository boardRepository,
+                            OrganizationService organizationService,
+                            BoardMapper boardMapper,
+                            CustomEventPublisher eventPublisher) {
         this.boardHashResolver = boardHashResolver;
         this.boardRepository = boardRepository;
         this.organizationService = organizationService;
         this.boardMapper = boardMapper;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -54,7 +61,7 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public UserMessage createBoard(BoardCreateForm dto, OrganizationToken token) {
+    public UserMessage createBoard(BoardCreateForm dto, OrganizationToken token, User currentUser) {
         String boardName = dto.getBoardName();
         if (boardRepository.existsByBoardName(boardName)) {
             throw new UserMessageException(String.format("Board with name '%s' already exists.", boardName));
@@ -68,6 +75,12 @@ public class BoardServiceImpl implements BoardService {
                 .build();
 
         Board persistedBoard = boardRepository.save(board);
+
+        eventPublisher.publishOrganizationRelatedEvent(this,
+                organization,
+                currentUser,
+                MessageTemplates.boardCreated(persistedBoard));
+
         String boardHash = boardHashResolver.obtainHash(persistedBoard.getId());
         UserMessage response = UserMessage.success(String.format("Board '%s' was successfully created!", boardName));
         response.addResponseDataEntry("persistedBoard", BoardReferenceResponse.builder()
@@ -79,18 +92,26 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public UserMessage updateBoard(BoardUpdateForm dto) {
+    public UserMessage updateBoard(BoardUpdateForm dto, User currentUser) {
         Long boardId = boardHashResolver.retrieveIdentifier(dto.getBoardHash());
         Board board = findById(boardId);
         board.setBoardName(dto.getBoardName());
-        boardRepository.save(board);
+        Board updatedBoard = boardRepository.save(board);
+
+        eventPublisher.publishOrganizationRelatedEvent(this,
+                board.getOrganization(),
+                currentUser,
+                MessageTemplates.boardUpdated(updatedBoard));
+
         return UserMessage.success("Board name was updated");
     }
 
     @Override
-    public void deleteBoard(String boardHash) {
+    public UserMessage deleteBoard(String boardHash) {
         Long boardId = boardHashResolver.retrieveIdentifier(boardHash);
         boardRepository.deleteById(boardId);
+
+        return UserMessage.success("Board successfully deleted");
     }
 
     private Optional<Board> getBoardIfUserHaveAccess(Long boardId, User currentUser) {

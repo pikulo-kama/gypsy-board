@@ -1,9 +1,16 @@
 package com.adrabazha.gypsy.board.token.service;
 
+import com.adrabazha.gypsy.board.domain.sql.Organization;
+import com.adrabazha.gypsy.board.domain.sql.User;
+import com.adrabazha.gypsy.board.repository.OrganizationRepository;
+import com.adrabazha.gypsy.board.service.OrganizationService;
+import com.adrabazha.gypsy.board.service.UserService;
 import com.adrabazha.gypsy.board.token.context.MembershipTokenContext;
 import com.adrabazha.gypsy.board.token.domain.MembershipToken;
 import com.adrabazha.gypsy.board.token.repository.MembershipTokenRepository;
-import com.adrabazha.gypsy.board.repository.OrganizationRepository;
+import com.adrabazha.gypsy.board.utils.TokenUtils;
+import com.adrabazha.gypsy.board.utils.mail.CustomEventPublisher;
+import com.adrabazha.gypsy.board.utils.mail.templates.MessageTemplates;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -16,21 +23,30 @@ import java.util.UUID;
 @Service
 public class MembershipTokenServiceImpl implements MembershipTokenService {
 
-    private final MembershipTokenRepository membershipTokenRepository;
-    private final OrganizationRepository organizationRepository;
-
     @Value("${application.token.lifetime}")
     private Integer tokenLifetimeHours;
 
-    public MembershipTokenServiceImpl(MembershipTokenRepository membershipTokenRepository, OrganizationRepository organizationRepository) {
+    private final MembershipTokenRepository membershipTokenRepository;
+    private final OrganizationRepository organizationRepository;
+    private final OrganizationService organizationService;
+    private final CustomEventPublisher eventPublisher;
+    private final UserService userService;
+
+    public MembershipTokenServiceImpl(MembershipTokenRepository membershipTokenRepository,
+                                      OrganizationRepository organizationRepository,
+                                      OrganizationService organizationService,
+                                      CustomEventPublisher eventPublisher, UserService userService) {
         this.membershipTokenRepository = membershipTokenRepository;
         this.organizationRepository = organizationRepository;
+        this.organizationService = organizationService;
+        this.eventPublisher = eventPublisher;
+        this.userService = userService;
     }
 
     @Override
     public MembershipToken createToken(MembershipTokenContext context) {
         MembershipToken token = MembershipToken.builder()
-                .expiryDate(getExpiryDate(tokenLifetimeHours))
+                .expiryDate(TokenUtils.getExpiryDate(tokenLifetimeHours))
                 .token(UUID.randomUUID().toString())
                 .organizationId(context.getOrganizationId())
                 .userId(context.getUserId())
@@ -41,7 +57,7 @@ public class MembershipTokenServiceImpl implements MembershipTokenService {
 
     @Override
     public void cleanExpiredTokens() {
-        List<MembershipToken> expiredTokens = getExpiredTokens();
+        List<MembershipToken> expiredTokens = membershipTokenRepository.getAllByExpiryDateBefore(new Date());
         expiredTokens.forEach(token ->
                 organizationRepository.deleteConcreteUserFromOrganization(token.getOrganizationId(), token.getUserId())
         );
@@ -59,16 +75,18 @@ public class MembershipTokenServiceImpl implements MembershipTokenService {
 
         MembershipToken tokenUnwrapped = membershipToken.get();
 
-        if (isExpired(tokenUnwrapped)) {
+        if (TokenUtils.isExpired(tokenUnwrapped)) {
             return false;
         }
 
         organizationRepository.updateUserInOrganization(tokenUnwrapped.getUserId(), tokenUnwrapped.getOrganizationId(), true);
         membershipTokenRepository.delete(tokenUnwrapped);
-        return true;
-    }
+        User user = userService.findById(tokenUnwrapped.getUserId());
 
-    private List<MembershipToken> getExpiredTokens() {
-        return membershipTokenRepository.getMembershipTokensByExpiryDateBefore(new Date());
+        Organization organization = organizationService.findById(tokenUnwrapped.getOrganizationId());
+        eventPublisher.publishOrganizationRelatedEvent(this, organization,
+                user, MessageTemplates.memberAcceptedInviteToOrganization());
+
+        return true;
     }
 }

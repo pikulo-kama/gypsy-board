@@ -10,6 +10,8 @@ import java.util.Optional;
 @Service
 public class SessionServiceImpl implements SessionService {
 
+    private static final String ORGANIZATION_TOKEN = "organizationToken";
+
     @Override
     public void setUserActiveOrganization(String organizationHash, Long organizationId, HttpServletRequest request) {
         OrganizationToken token = OrganizationToken.builder()

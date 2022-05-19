@@ -11,6 +11,8 @@ import com.adrabazha.gypsy.board.dto.response.TaskResponse;
 import com.adrabazha.gypsy.board.exception.GeneralException;
 import com.adrabazha.gypsy.board.mapper.TaskMapper;
 import com.adrabazha.gypsy.board.repository.TaskRepository;
+import com.adrabazha.gypsy.board.utils.mail.CustomEventPublisher;
+import com.adrabazha.gypsy.board.utils.mail.templates.MessageTemplates;
 import com.adrabazha.gypsy.board.utils.resolver.BoardColumnHashResolver;
 import com.adrabazha.gypsy.board.utils.resolver.TaskHashResolver;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,22 +30,30 @@ import java.util.stream.IntStream;
 public class TaskServiceImpl implements TaskService {
 
     private static final String INITIAL_TASK_DESCRIPTION = "{\"ops\":[{\"insert\":\"\\n\"}]}";
+
     private final BoardColumnHashResolver boardColumnHashResolver;
     private final TaskHashResolver taskHashResolver;
     private final BoardColumnService boardColumnService;
     private final TaskRepository taskRepository;
     private final TaskMapper taskMapper;
     private final UserService userService;
+    private final CustomEventPublisher eventPublisher;
 
     @Autowired
-    public TaskServiceImpl(BoardColumnHashResolver boardColumnHashResolver, TaskHashResolver taskHashResolver, BoardColumnService boardColumnService,
-                           TaskRepository taskRepository, TaskMapper taskMapper, UserService userService) {
+    public TaskServiceImpl(BoardColumnHashResolver boardColumnHashResolver,
+                           TaskHashResolver taskHashResolver,
+                           BoardColumnService boardColumnService,
+                           TaskRepository taskRepository,
+                           TaskMapper taskMapper,
+                           UserService userService,
+                           CustomEventPublisher eventPublisher) {
         this.boardColumnHashResolver = boardColumnHashResolver;
         this.taskHashResolver = taskHashResolver;
         this.boardColumnService = boardColumnService;
         this.taskRepository = taskRepository;
         this.taskMapper = taskMapper;
         this.userService = userService;
+        this.eventPublisher = eventPublisher;
     }
 
     private Task findById(Long taskId) {
@@ -58,7 +68,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public TaskReferenceResponse createTask(TaskCreateForm taskForm) {
+    public TaskReferenceResponse createTask(TaskCreateForm taskForm, User currentUser) {
         Long columnId = boardColumnHashResolver.retrieveIdentifier(taskForm.getColumnHash());
         BoardColumn boardColumn = boardColumnService.findById(columnId);
         Integer taskOrder = getNextPosition(boardColumn);
@@ -71,11 +81,16 @@ public class TaskServiceImpl implements TaskService {
                 .build();
         Task persistedTask = taskRepository.save(task);
 
+        eventPublisher.publishOrganizationRelatedEvent(this,
+                boardColumn.getBoard().getOrganization(),
+                currentUser,
+                MessageTemplates.taskCreated(persistedTask));
+
         return taskMapper.mapTaskToReferenceResponse(persistedTask);
     }
 
     @Override
-    public void updateTask(TaskUpdateForm taskUpdateForm) {
+    public void updateTask(TaskUpdateForm taskUpdateForm, User currentUser) {
         Long taskId = taskHashResolver.retrieveIdentifier(taskUpdateForm.getTaskHash());
 
         Task task = findById(taskId);
@@ -88,7 +103,12 @@ public class TaskServiceImpl implements TaskService {
             taskBuilder.userAssigned(assignee);
         }
 
-        taskRepository.save(taskBuilder.build());
+        Task updatedTask = taskRepository.save(taskBuilder.build());
+
+        eventPublisher.publishOrganizationRelatedEvent(this,
+                updatedTask.getBoardColumn().getBoard().getOrganization(),
+                currentUser,
+                MessageTemplates.taskUpdated(updatedTask));
     }
 
     @Override

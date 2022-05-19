@@ -10,7 +10,7 @@
                 <div class="form-container">
                     <div class="d-flex flex-column">
                         <div class="d-flex flex-column h-100">
-                            <input name="${(_csrf.parameterName)!}" value="${(_csrf.token)!}" type="hidden"/>
+                            <input name="${(_csrf.parameterName)!}" value="${(_csrf.applicationToken)!}" type="hidden"/>
                             <input id="selectedUsers" type="hidden" name="memberUsernames">
                         </div>
 

@@ -14,7 +14,7 @@
                                 <input type="text" id="organization-name-field" class="form-control"/>
                                 <label class="form-label" for="organization-name-field">Organization Name</label>
                             </div>
-                            <input name="${(_csrf.parameterName)!}" value="${(_csrf.token)!}" type="hidden"/>
+                            <input name="${(_csrf.parameterName)!}" value="${(_csrf.applicationToken)!}" type="hidden"/>
                             <input id="selectedUsers" type="hidden" name="memberUsernames">
                         </div>
 

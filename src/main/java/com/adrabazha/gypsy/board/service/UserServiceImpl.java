@@ -11,6 +11,7 @@ import com.adrabazha.gypsy.board.exception.UserMessageException;
 import com.adrabazha.gypsy.board.mapper.UserMapper;
 import com.adrabazha.gypsy.board.repository.OrganizationRepository;
 import com.adrabazha.gypsy.board.repository.UserRepository;
+import com.adrabazha.gypsy.board.utils.mail.CustomEventPublisher;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -31,25 +32,23 @@ import java.util.stream.Collectors;
 @Service
 public class UserServiceImpl implements UserService, UserDetailsService, AuthenticationService {
 
-    private final ApplicationEventPublisher eventPublisher;
+    private final CustomEventPublisher eventPublisher;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
     private final OrganizationRepository organizationRepository;
 
     @Autowired
-    public UserServiceImpl(ApplicationEventPublisher eventPublisher, UserRepository userRepository,
-                           PasswordEncoder passwordEncoder, UserMapper userMapper, OrganizationRepository organizationRepository) {
+    public UserServiceImpl(CustomEventPublisher eventPublisher,
+                           UserRepository userRepository,
+                           PasswordEncoder passwordEncoder,
+                           UserMapper userMapper,
+                           OrganizationRepository organizationRepository) {
         this.eventPublisher = eventPublisher;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.userMapper = userMapper;
         this.organizationRepository = organizationRepository;
-    }
-
-    @Override
-    public List<User> findAll() {
-        return userRepository.findAll();
     }
 
     @Override
@@ -100,11 +99,6 @@ public class UserServiceImpl implements UserService, UserDetailsService, Authent
     }
 
     @Override
-    public List<User> findUsersFromOrganization(Organization organization, String input) {
-        return userRepository.findUsersByOrganizationsContainsAndUsernameContains(organization, input);
-    }
-
-    @Override
     @Transactional
     public UserMessage findOrganizationMembersByInput(String input, Long organizationId) {
         List<UserResponse> userResponses = lookupByInputString(input);
@@ -148,11 +142,7 @@ public class UserServiceImpl implements UserService, UserDetailsService, Authent
 
         User persistedUser = userRepository.save(user);
 
-        RegistrationCompletedEvent event = RegistrationCompletedEvent.builder()
-                .user(persistedUser)
-                .request(request)
-                .build();
-        eventPublisher.publishEvent(event);
+        eventPublisher.publishRegistrationCompletedEvent(this, persistedUser, request);
     }
 
     @Override

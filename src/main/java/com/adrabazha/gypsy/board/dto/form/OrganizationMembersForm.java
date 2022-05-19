@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @AllArgsConstructor
@@ -13,5 +14,6 @@ import java.util.List;
 @Builder
 public class OrganizationMembersForm {
 
+    @NotNull
     private List<String> organizationMembers;
 }

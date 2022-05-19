@@ -47,8 +47,8 @@ public class OrganizationRestController {
 
     @OrganizationAccess({ADMIN})
     @PostMapping("/delete")
-    public UserMessage deleteOrganization(@RequestParam("o") String organizationHash) {
-        return organizationService.deleteOrganization(organizationHash);
+    public UserMessage deleteOrganization(@RequestParam("o") String organizationHash, @AuthenticationPrincipal User currentUser) {
+        return organizationService.deleteOrganization(organizationHash, currentUser);
     }
 
     @GetMapping("/restrictionSelector")
@@ -60,24 +60,28 @@ public class OrganizationRestController {
 
     @OrganizationAccess({ADMIN})
     @PostMapping("/updateUserRole")
-    public UserMessage updateMemberRole(@Validated @RequestBody UpdateMemberRoleForm form, HttpServletRequest request) {
+    public UserMessage updateMemberRole(@Validated @RequestBody UpdateMemberRoleForm form,
+                                        HttpServletRequest request,
+                                        @AuthenticationPrincipal User currentUser) {
         OrganizationToken token = sessionService.getUserActiveOrganization(request);
-        return organizationService.updateMemberRole(form, token.getOrganizationId());
+        return organizationService.updateMemberRole(form, token.getOrganizationId(), currentUser);
     }
 
     @OrganizationAccess({ADMIN, ASSISTANT})
     @PostMapping("/addMembers")
     public UserMessage addOrganizationMembers(@Validated @RequestBody OrganizationMembersForm form,
-                                              HttpServletRequest request) {
+                                              HttpServletRequest request,
+                                              @AuthenticationPrincipal User currentUser) {
         OrganizationToken token = sessionService.getUserActiveOrganization(request);
-        return organizationService.addMembersToOrganization(form, token.getOrganizationId(), request);
+        return organizationService.addMembersToOrganization(form, token.getOrganizationId(), request, currentUser);
     }
 
     @OrganizationAccess({ADMIN})
     @PostMapping("/removeMember")
     public UserMessage removeOrganizationMember(@Validated @RequestBody OrganizationMemberForm form,
-                                                HttpServletRequest request) {
+                                                HttpServletRequest request,
+                                                @AuthenticationPrincipal User currentUser) {
         OrganizationToken token = sessionService.getUserActiveOrganization(request);
-        return organizationService.removeOrganizationMember(form, token.getOrganizationId());
+        return organizationService.removeOrganizationMember(form, token.getOrganizationId(), currentUser);
     }
 }

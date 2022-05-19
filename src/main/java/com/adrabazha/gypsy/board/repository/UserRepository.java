@@ -20,6 +20,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findUsersByUsernameIn(List<@NotNull String> usernames);
 
     List<User> findUsersByOrganizationsContains(Organization organization);
-
-    List<User> findUsersByOrganizationsContainsAndUsernameContains(Organization organizations, @NotNull String username);
 }
