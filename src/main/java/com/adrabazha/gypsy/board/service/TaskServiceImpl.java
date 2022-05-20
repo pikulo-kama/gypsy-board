@@ -8,8 +8,7 @@ import com.adrabazha.gypsy.board.dto.form.TaskCreateForm;
 import com.adrabazha.gypsy.board.dto.form.TaskUpdateForm;
 import com.adrabazha.gypsy.board.dto.response.TaskReferenceResponse;
 import com.adrabazha.gypsy.board.dto.response.TaskResponse;
-import com.adrabazha.gypsy.board.exception.GeneralException;
-import com.adrabazha.gypsy.board.mapper.TaskMapper;
+import com.adrabazha.gypsy.board.utils.mapper.TaskMapper;
 import com.adrabazha.gypsy.board.repository.TaskRepository;
 import com.adrabazha.gypsy.board.utils.mail.CustomEventPublisher;
 import com.adrabazha.gypsy.board.utils.mail.templates.MessageTemplates;
@@ -57,8 +56,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     private Task findById(Long taskId) {
-        return taskRepository.findById(taskId)
-                .orElseThrow(() -> new GeneralException("Task not found"));
+        return taskRepository.
     }
 
     @Override

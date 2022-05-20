@@ -11,7 +11,7 @@ import com.adrabazha.gypsy.board.dto.response.AbsenceRequestResponse;
 import com.adrabazha.gypsy.board.dto.response.ChartResponse;
 import com.adrabazha.gypsy.board.exception.GeneralException;
 import com.adrabazha.gypsy.board.exception.UserMessageException;
-import com.adrabazha.gypsy.board.mapper.AbsenceRecordMapper;
+import com.adrabazha.gypsy.board.utils.mapper.AbsenceRecordMapper;
 import com.adrabazha.gypsy.board.repository.AbsenceRecordRepository;
 import com.adrabazha.gypsy.board.utils.mail.CustomEventPublisher;
 import com.adrabazha.gypsy.board.utils.mail.templates.MessageTemplates;

@@ -10,7 +10,7 @@ import com.adrabazha.gypsy.board.dto.form.DocumentUpdateForm;
 import com.adrabazha.gypsy.board.dto.response.DocumentReferenceResponse;
 import com.adrabazha.gypsy.board.dto.response.DocumentResponse;
 import com.adrabazha.gypsy.board.exception.GeneralException;
-import com.adrabazha.gypsy.board.mapper.DocumentMapper;
+import com.adrabazha.gypsy.board.utils.mapper.DocumentMapper;
 import com.adrabazha.gypsy.board.repository.OrganizationDocumentRepository;
 import com.adrabazha.gypsy.board.utils.mail.CustomEventPublisher;
 import com.adrabazha.gypsy.board.utils.mail.templates.MessageTemplates;

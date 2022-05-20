@@ -1,4 +1,4 @@
-package com.adrabazha.gypsy.board.listener;
+package com.adrabazha.gypsy.board.event.listener;
 
 import com.adrabazha.gypsy.board.utils.mail.MailMessageProvider;
 import com.adrabazha.gypsy.board.service.MailService;

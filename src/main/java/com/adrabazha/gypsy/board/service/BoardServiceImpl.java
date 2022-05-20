@@ -11,7 +11,7 @@ import com.adrabazha.gypsy.board.dto.response.BoardReferenceResponse;
 import com.adrabazha.gypsy.board.dto.response.BoardResponse;
 import com.adrabazha.gypsy.board.exception.GeneralException;
 import com.adrabazha.gypsy.board.exception.UserMessageException;
-import com.adrabazha.gypsy.board.mapper.BoardMapper;
+import com.adrabazha.gypsy.board.utils.mapper.BoardMapper;
 import com.adrabazha.gypsy.board.repository.BoardRepository;
 import com.adrabazha.gypsy.board.utils.mail.CustomEventPublisher;
 import com.adrabazha.gypsy.board.utils.mail.templates.MessageTemplates;

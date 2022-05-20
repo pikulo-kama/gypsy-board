@@ -1,4 +1,4 @@
-package com.adrabazha.gypsy.board.mapper;
+package com.adrabazha.gypsy.board.utils.mapper;
 
 import com.adrabazha.gypsy.board.domain.sql.AbsenceRecord;
 import com.adrabazha.gypsy.board.dto.response.AbsenceRecordResponse;
