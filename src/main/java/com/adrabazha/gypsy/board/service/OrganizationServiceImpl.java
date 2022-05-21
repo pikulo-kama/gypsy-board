@@ -9,30 +9,34 @@ import com.adrabazha.gypsy.board.dto.form.OrganizationForm;
 import com.adrabazha.gypsy.board.dto.form.OrganizationMemberForm;
 import com.adrabazha.gypsy.board.dto.form.OrganizationMembersForm;
 import com.adrabazha.gypsy.board.dto.form.UpdateMemberRoleForm;
+import com.adrabazha.gypsy.board.dto.response.BoardReferenceResponse;
 import com.adrabazha.gypsy.board.dto.response.OrganizationReferenceResponse;
 import com.adrabazha.gypsy.board.dto.response.OrganizationResponse;
 import com.adrabazha.gypsy.board.dto.response.UserReferenceResponse;
 import com.adrabazha.gypsy.board.dto.response.UserResponse;
-import com.adrabazha.gypsy.board.event.NewMembersAddedEvent;
 import com.adrabazha.gypsy.board.exception.GeneralException;
 import com.adrabazha.gypsy.board.exception.UserMessageException;
-import com.adrabazha.gypsy.board.mapper.OrganizationMapper;
-import com.adrabazha.gypsy.board.mapper.UserMapper;
+import com.adrabazha.gypsy.board.repository.BoardRepository;
+import com.adrabazha.gypsy.board.utils.mapper.OrganizationMapper;
+import com.adrabazha.gypsy.board.utils.mapper.UserMapper;
 import com.adrabazha.gypsy.board.repository.OrganizationRepository;
 import com.adrabazha.gypsy.board.repository.OrganizationRoleRepository;
 import com.adrabazha.gypsy.board.utils.mail.CustomEventPublisher;
 import com.adrabazha.gypsy.board.utils.mail.templates.MessageTemplates;
-import com.adrabazha.gypsy.board.utils.resolver.OrganizationHashResolver;
-import com.adrabazha.gypsy.board.utils.resolver.UserHashResolver;
+import com.adrabazha.gypsy.board.utils.resolver.HashResolverFactory;
+import com.adrabazha.gypsy.board.utils.resolver.Resolver;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
+import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -43,29 +47,29 @@ public class OrganizationServiceImpl implements OrganizationService {
     private final OrganizationRepository organizationRepository;
     private final OrganizationRoleRepository organizationRoleRepository;
     private final OrganizationMapper organizationMapper;
-    private final OrganizationHashResolver organizationHashResolver;
     private final UserService userService;
     private final UserMapper userMapper;
-    private final UserHashResolver userHashResolver;
     private final CustomEventPublisher eventPublisher;
+    private final HashResolverFactory hashResolverFactory;
+    private final BoardRepository boardRepository;
 
     @Autowired
     public OrganizationServiceImpl(OrganizationRepository organizationRepository,
                                    OrganizationRoleRepository organizationRoleRepository,
                                    OrganizationMapper organizationMapper,
-                                   OrganizationHashResolver organizationHashResolver,
                                    UserService userService,
                                    UserMapper userMapper,
-                                   UserHashResolver userHashResolver,
-                                   CustomEventPublisher eventPublisher) {
+                                   CustomEventPublisher eventPublisher,
+                                   HashResolverFactory hashResolverFactory,
+                                   BoardRepository boardRepository) {
         this.organizationRepository = organizationRepository;
         this.organizationRoleRepository = organizationRoleRepository;
         this.organizationMapper = organizationMapper;
-        this.organizationHashResolver = organizationHashResolver;
         this.userService = userService;
         this.userMapper = userMapper;
-        this.userHashResolver = userHashResolver;
         this.eventPublisher = eventPublisher;
+        this.hashResolverFactory = hashResolverFactory;
+        this.boardRepository = boardRepository;
     }
 
     @Override
@@ -82,7 +86,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Override
     @Transactional
     public UserMessage updateMemberRole(UpdateMemberRoleForm form, Long organizationId, User currentUser) {
-        Long userId = userHashResolver.retrieveIdentifier(form.getUserHash());
+        Long userId = hashResolverFactory.retrieveIdentifier(form.getUserHash());
         String userCurrentRole = organizationRepository.getOrganizationMemberRole(userId, organizationId);
         UserMessage userMessage;
 
@@ -168,7 +172,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Override
     @Transactional
     public UserMessage removeOrganizationMember(OrganizationMemberForm form, Long organizationId, User currentUser) {
-        Long userId = userHashResolver.retrieveIdentifier(form.getMemberHash());
+        Long userId = hashResolverFactory.retrieveIdentifier(form.getMemberHash());
         UserMessage message;
 
         String memberRole = getOrganizationMemberRole(userId, organizationId);
@@ -198,9 +202,22 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
+    public List<OrganizationReferenceResponse> getAllByInput(String input) {
+        List<OrganizationReferenceResponse> organizations = Collections.emptyList();
+
+        if (!input.isEmpty()) {
+            Pageable limit = PageRequest.of(0, 5);
+            organizations = organizationRepository.findAllByOrganizationNameContains(input, limit).stream()
+                    .map(organizationMapper::mapOrganizationsToReferenceResponse)
+                    .collect(Collectors.toList());
+        }
+        return organizations;
+    }
+
+    @Override
     @Transactional
     public UserMessage deleteOrganization(String organizationHash, User currentUser) {
-        Long organizationId = organizationHashResolver.retrieveIdentifier(organizationHash);
+        Long organizationId = hashResolverFactory.retrieveIdentifier(organizationHash);
         Organization organization = findById(organizationId);
         organizationRepository.deleteUsersFromOrganization(organization.getOrganizationId());
         organizationRepository.deleteById(organization.getOrganizationId());
@@ -238,16 +255,20 @@ public class OrganizationServiceImpl implements OrganizationService {
         }
 
         OrganizationResponse organizationResponse = organizationMapper.mapOrganizationToResponse(organization);
+        // Add members with their correct roles
         List<UserReferenceResponse> members = organization.getAllMembers().stream().map(user ->
                 UserReferenceResponse.builder()
-                        .userHash(userHashResolver.obtainHash(user.getUserId()))
+                        .userHash(hashResolverFactory.obtainHash(user.getUserId(), Resolver.USER))
                         .fullName(user.getFullName())
                         .activeRole(getOrganizationMemberRole(user.getUserId(), organizationId))
                         .isInvitationAccepted(organizationRepository.isInvitationAccepted(user.getUserId(), organizationId))
                         .build()
         ).collect(Collectors.toList());
-
         organizationResponse.setOrganizationMembers(members);
+
+        // Add boards shared by other organizations
+        List<BoardReferenceResponse> sharedBoards = getOrganizationSharedBoards(organization.getOrganizationId());
+        organizationResponse.addOrganizationBoards(sharedBoards);
 
         return organizationResponse;
     }
@@ -287,6 +308,22 @@ public class OrganizationServiceImpl implements OrganizationService {
                 organization,
                 memberPerformed,
                 MessageTemplates.memberWasInvitedToOrganization(member)));
+    }
+
+    private List<BoardReferenceResponse> getOrganizationSharedBoards(Long organizationId) {
+        List<Map<String, Object>> rawBoards = boardRepository.getOrganizationSharedBoards(organizationId);
+        return rawBoards.stream().map(boardMap -> {
+            Long boardId = ((BigInteger) boardMap.get("board_id")).longValue();
+            String boardName = (String) boardMap.get("board_name");
+            Long organizationOwnerId = ((BigInteger) boardMap.get("organization_id")).longValue();
+
+            return BoardReferenceResponse.builder()
+                    .boardHash(hashResolverFactory.obtainHash(boardId, Resolver.BOARD))
+                    .boardName(boardName)
+                    .isShared(true)
+                    .ownerOrganization(findById(organizationOwnerId))
+                    .build();
+        }).collect(Collectors.toList());
     }
 
     private void addUsersToOrganization(List<User> users, Organization organization, Long roleId, Boolean isInvitationAccepted) {

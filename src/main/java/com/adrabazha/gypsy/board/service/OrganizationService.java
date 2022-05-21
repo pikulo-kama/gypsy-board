@@ -43,4 +43,6 @@ public interface OrganizationService {
                                          HttpServletRequest request, User currentUser);
 
     UserMessage removeOrganizationMember(OrganizationMemberForm form, Long organizationId, User currentUser);
+
+    List<OrganizationReferenceResponse> getAllByInput(String input);
 }

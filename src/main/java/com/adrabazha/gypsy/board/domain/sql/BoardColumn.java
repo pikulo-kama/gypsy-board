@@ -37,7 +37,7 @@ public class BoardColumn {
     @JoinColumn(name = "board_id")
     private Board board;
 
-    @OneToMany(mappedBy = "boardColumn", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "boardColumn", fetch = FetchType.LAZY)
     @ToString.Exclude
     private List<Task> tasks;
 }

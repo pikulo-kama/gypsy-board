@@ -2,6 +2,7 @@ const REMOVE_REFERENCE = 'user-remove-reference';
 const ADD_REFERENCE = 'user-add-reference';
 
 let selectedUsers = [];
+let selectedOrganizations = [];
 let defaultUserPictures = [];
 let userRoles = {};
 
@@ -141,29 +142,68 @@ $('#create-organization-btn').on('click', function () {
         $('#close-organization-window-btn').trigger('click');
     }
 
+
+
     request.send(JSON.stringify({
         "organizationName": organizationName,
         "memberUsernames": userList
     }));
 })
 
-$(document).ready(function () {
-    $('.user-image').each(function () {
-        $(this).attr('src', getRandomPicture());
-    });
-});
+$('#create-shared-board-btn').on('click', function () {
+    let boardName = $('#shared-board-name-field').val();
+    let collaboratorList = [];
+    for (let collaborator of $('#selected-organization-list').children()) {
+        collaboratorList.push($(collaborator).attr('hash'));
+    }
+
+    let request = openRestHttpPostRequest('/boards/shared/create');
+    request.onload = function () {
+        let response = new UserMessage(request.responseText);
+        if (response.isSuccess()) {
+            let boardName = response.responseData['persistedBoard']['boardName'];
+            let boardHash = response.responseData['persistedBoard']['boardHash'];
+
+            let boardListContainer = $('#board-data-list')
+            if (boardListContainer !== undefined) {
+                $('#no-boards-list-item').remove();
+            }
+            boardListContainer.append(`<li><a href="/boards?b=${boardHash}">${boardName}</a></li>`);
+        }
+        $('#close-shared-board-window-btn').trigger('click');
+    }
+
+    request.send(JSON.stringify({
+        "boardName": boardName,
+        "collaboratorList": collaboratorList
+    }));
+})
 
 function onUserAddCallback(node) {
-    let user = deserializeNode(node);
-    $('#selected-user-list').append(getListItemString(user['username'], user['fullName'], REMOVE_REFERENCE))
+    let user = deserializeUserNode(node);
+    $('#selected-user-list').append(getUserItemString(user['username'], user['fullName'], REMOVE_REFERENCE))
     selectedUsers.push(user['username'])
     $(node).remove();
 }
 
 function onUserRemoveCallback(node) {
-    let user = deserializeNode(node);
+    let user = deserializeUserNode(node);
     // remove user
     selectedUsers = selectedUsers.filter(innerUser => innerUser !== user['username']);
+    $(node).remove();
+}
+
+function onOrganizationAddCallback(node) {
+    let organization = deserializeOrganizationNode(node);
+    $('#selected-organization-list').append(getOrganizationItemString(organization['hash'], organization['name'], REMOVE_REFERENCE))
+    selectedOrganizations.push(organization['name']);
+    $(node).remove();
+}
+
+function onOrganizationRemoveCallback(node) {
+    let organization = deserializeOrganizationNode(node);
+    // remove organization
+    selectedOrganizations = selectedOrganizations.filter(collaborator => collaborator !== organization['name']);
     $(node).remove();
 }
 
@@ -179,7 +219,7 @@ $('#member-lookup-input').on("change keyup paste", function () {
             userListSelector.empty();
             for (let user of users) {
                 if (!selectedUsers.includes(user['username'])) {
-                    userListSelector.append(getListItemString(user['username'], user['fullName'], ADD_REFERENCE));
+                    userListSelector.append(getUserItemString(user['username'], user['fullName'], ADD_REFERENCE));
                 }
             }
         }
@@ -202,7 +242,27 @@ $('#user-lookup-input').on("change keyup paste", function () {
         userListSelector.empty();
         for (let user of users) {
             if (!selectedUsers.includes(user['username'])) {
-                userListSelector.append(getListItemString(user['username'], user['fullName'], ADD_REFERENCE));
+                userListSelector.append(getUserItemString(user['username'], user['fullName'], ADD_REFERENCE));
+            }
+        }
+    }
+    httpRequest.send();
+});
+
+$('#organization-lookup-input').on("change keyup paste", function () {
+    let httpRequest = openRestHttpGetRequest('/organizations/lookup?input='.concat($(this).val()));
+
+    httpRequest.onload = function () {
+        let collaboratorListSelector = $('#lookup-organization-list');
+        let organizations = [];
+        if (httpRequest.responseText !== '') {
+            organizations = JSON.parse(httpRequest.responseText);
+        }
+
+        collaboratorListSelector.empty();
+        for (let organization of organizations) {
+            if (!selectedOrganizations.includes(organization['organizationName'])) {
+                collaboratorListSelector.append(getOrganizationItemString(organization['organizationHash'], organization['organizationName'], ADD_REFERENCE));
             }
         }
     }
@@ -214,7 +274,7 @@ $('#submit-organization').hover(function () {
     selectedUsersNode.val(selectedUsers.toString());
 })
 
-function getListItemString(username, fullName, identifier) {
+function getUserItemString(username, fullName, identifier) {
     let callback;
     if (identifier === ADD_REFERENCE) {
         callback = 'onUserAddCallback(this)';
@@ -226,10 +286,29 @@ function getListItemString(username, fullName, identifier) {
     return `<li style="cursor:pointer;" class="${identifier}" username="${username}" onclick="${callback}">${fullName}</li>`;
 }
 
-function deserializeNode(node) {
+function getOrganizationItemString(hash, name, identifier) {
+    let callback;
+    if (identifier === ADD_REFERENCE) {
+        callback = 'onOrganizationAddCallback(this)';
+    } else if (identifier === REMOVE_REFERENCE) {
+        callback = 'onOrganizationRemoveCallback(this)';
+    } else {
+        return '';
+    }
+    return `<li style="cursor:pointer;" class="${identifier}" hash="${hash}" onclick="${callback}">${name}</li>`;
+}
+
+function deserializeUserNode(node) {
     return {
         'username': $(node).attr('username'),
         'fullName': $(node).text()
+    }
+}
+
+function deserializeOrganizationNode(node) {
+    return {
+        'name': $(node).text(),
+        'hash': $(node).attr('hash')
     }
 }
 

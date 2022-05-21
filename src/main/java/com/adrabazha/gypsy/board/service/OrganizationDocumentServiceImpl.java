@@ -10,11 +10,11 @@ import com.adrabazha.gypsy.board.dto.form.DocumentUpdateForm;
 import com.adrabazha.gypsy.board.dto.response.DocumentReferenceResponse;
 import com.adrabazha.gypsy.board.dto.response.DocumentResponse;
 import com.adrabazha.gypsy.board.exception.GeneralException;
-import com.adrabazha.gypsy.board.mapper.DocumentMapper;
+import com.adrabazha.gypsy.board.utils.mapper.DocumentMapper;
 import com.adrabazha.gypsy.board.repository.OrganizationDocumentRepository;
 import com.adrabazha.gypsy.board.utils.mail.CustomEventPublisher;
 import com.adrabazha.gypsy.board.utils.mail.templates.MessageTemplates;
-import com.adrabazha.gypsy.board.utils.resolver.DocumentHashResolver;
+import com.adrabazha.gypsy.board.utils.resolver.HashResolverFactory;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
@@ -34,7 +34,7 @@ public class OrganizationDocumentServiceImpl implements OrganizationDocumentServ
     private static final String DOCUMENT_SEQUENCE_NAME = "document_sequence";
 
     private final OrganizationDocumentRepository organizationDocumentRepository;
-    private final DocumentHashResolver documentHashResolver;
+    private final HashResolverFactory hashResolverFactory;
     private final DocumentMapper documentMapper;
     private final UserService userService;
     private final OrganizationService organizationService;
@@ -42,14 +42,14 @@ public class OrganizationDocumentServiceImpl implements OrganizationDocumentServ
     private final CustomEventPublisher eventPublisher;
 
     public OrganizationDocumentServiceImpl(OrganizationDocumentRepository organizationDocumentRepository,
-                                           DocumentHashResolver documentHashResolver,
+                                           HashResolverFactory hashResolverFactory,
                                            DocumentMapper documentMapper,
                                            UserService userService,
                                            OrganizationService organizationService,
-                                           MongoOperations mongoOperations, 
+                                           MongoOperations mongoOperations,
                                            CustomEventPublisher eventPublisher) {
         this.organizationDocumentRepository = organizationDocumentRepository;
-        this.documentHashResolver = documentHashResolver;
+        this.hashResolverFactory = hashResolverFactory;
         this.documentMapper = documentMapper;
         this.userService = userService;
         this.organizationService = organizationService;
@@ -107,7 +107,7 @@ public class OrganizationDocumentServiceImpl implements OrganizationDocumentServ
 
     @Override
     public UserMessage updateDocument(DocumentUpdateForm documentUpdateForm, User currentUser) {
-        Long documentId = documentHashResolver.retrieveIdentifier(documentUpdateForm.getDocumentHash());
+        Long documentId = hashResolverFactory.retrieveIdentifier(documentUpdateForm.getDocumentHash());
         OrganizationDocument document = findById(documentId);
 
         OrganizationDocument updatedDocument = document.toBuilder()
@@ -131,7 +131,7 @@ public class OrganizationDocumentServiceImpl implements OrganizationDocumentServ
 
     @Override
     public UserMessage deleteDocument(String documentHash, User currentUser) {
-        Long documentId = documentHashResolver.retrieveIdentifier(documentHash);
+        Long documentId = hashResolverFactory.retrieveIdentifier(documentHash);
         OrganizationDocument document = findById(documentId);
         Organization organization = organizationService.findById(document.getOrganizationId());
 
@@ -150,7 +150,7 @@ public class OrganizationDocumentServiceImpl implements OrganizationDocumentServ
 
     @Override
     public UserMessage getSpecificDocument(String documentHash) {
-        Long documentId = documentHashResolver.retrieveIdentifier(documentHash);
+        Long documentId = hashResolverFactory.retrieveIdentifier(documentHash);
         OrganizationDocument document = findById(documentId);
         User author = userService.findById(document.getAuthorId());
 

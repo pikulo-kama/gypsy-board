@@ -1,10 +1,11 @@
-package com.adrabazha.gypsy.board.mapper;
+package com.adrabazha.gypsy.board.utils.mapper;
 
 import com.adrabazha.gypsy.board.domain.sql.Task;
 import com.adrabazha.gypsy.board.dto.response.TaskReferenceResponse;
 import com.adrabazha.gypsy.board.dto.response.TaskResponse;
 import com.adrabazha.gypsy.board.dto.response.UserResponse;
-import com.adrabazha.gypsy.board.utils.resolver.TaskHashResolver;
+import com.adrabazha.gypsy.board.utils.resolver.HashResolverFactory;
+import com.adrabazha.gypsy.board.utils.resolver.Resolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -14,18 +15,19 @@ import static java.util.Objects.nonNull;
 public class TaskMapper {
 
     private final UserMapper userMapper;
-    private final TaskHashResolver taskHashResolver;
+    private final HashResolverFactory hashResolverFactory;
 
     @Autowired
-    public TaskMapper(UserMapper userMapper, TaskHashResolver taskHashResolver) {
+    public TaskMapper(UserMapper userMapper,
+                      HashResolverFactory hashResolverFactory) {
         this.userMapper = userMapper;
-        this.taskHashResolver = taskHashResolver;
+        this.hashResolverFactory = hashResolverFactory;
     }
 
     public TaskReferenceResponse mapTaskToReferenceResponse(Task task) {
         return TaskReferenceResponse.builder()
                 .taskName(task.getTaskName())
-                .taskHash(taskHashResolver.obtainHash(task.getTaskId()))
+                .taskHash(hashResolverFactory.obtainHash(task.getTaskId(), Resolver.TASK))
                 .build();
     }
 

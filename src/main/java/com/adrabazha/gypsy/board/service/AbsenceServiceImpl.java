@@ -11,12 +11,11 @@ import com.adrabazha.gypsy.board.dto.response.AbsenceRequestResponse;
 import com.adrabazha.gypsy.board.dto.response.ChartResponse;
 import com.adrabazha.gypsy.board.exception.GeneralException;
 import com.adrabazha.gypsy.board.exception.UserMessageException;
-import com.adrabazha.gypsy.board.mapper.AbsenceRecordMapper;
+import com.adrabazha.gypsy.board.utils.mapper.AbsenceRecordMapper;
 import com.adrabazha.gypsy.board.repository.AbsenceRecordRepository;
 import com.adrabazha.gypsy.board.utils.mail.CustomEventPublisher;
 import com.adrabazha.gypsy.board.utils.mail.templates.MessageTemplates;
-import com.adrabazha.gypsy.board.utils.resolver.AbsenceRecordHashResolver;
-import com.adrabazha.gypsy.board.utils.resolver.OrganizationHashResolver;
+import com.adrabazha.gypsy.board.utils.resolver.HashResolverFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.Calendar;
@@ -30,24 +29,21 @@ import java.util.stream.Collectors;
 @Service
 public class AbsenceServiceImpl implements AbsenceService {
 
+    private final HashResolverFactory hashResolverFactory;
     private final OrganizationService organizationService;
-    private final OrganizationHashResolver organizationHashResolver;
     private final AbsenceRecordRepository absenceRecordRepository;
     private final AbsenceRecordMapper absenceRecordMapper;
-    private final AbsenceRecordHashResolver absenceRecordHashResolver;
     private final CustomEventPublisher eventPublisher;
 
-    public AbsenceServiceImpl(OrganizationService organizationService,
-                              OrganizationHashResolver organizationHashResolver,
+    public AbsenceServiceImpl(HashResolverFactory hashResolverFactory,
+                              OrganizationService organizationService,
                               AbsenceRecordRepository absenceRecordRepository,
                               AbsenceRecordMapper absenceRecordMapper,
-                              AbsenceRecordHashResolver absenceRecordHashResolver,
                               CustomEventPublisher eventPublisher) {
+        this.hashResolverFactory = hashResolverFactory;
         this.organizationService = organizationService;
-        this.organizationHashResolver = organizationHashResolver;
         this.absenceRecordRepository = absenceRecordRepository;
         this.absenceRecordMapper = absenceRecordMapper;
-        this.absenceRecordHashResolver = absenceRecordHashResolver;
         this.eventPublisher = eventPublisher;
     }
 
@@ -86,7 +82,7 @@ public class AbsenceServiceImpl implements AbsenceService {
 
     @Override
     public UserMessage getMemberAbsenceHistory(String organizationHash, User member) {
-        Long organizationId = organizationHashResolver.retrieveIdentifier(organizationHash);
+        Long organizationId = hashResolverFactory.retrieveIdentifier(organizationHash);
         Organization organization = organizationService.findById(organizationId);
         List<AbsenceRecord> absences = absenceRecordRepository.findAllByOrganizationAndMember(organization, member);
 
@@ -103,7 +99,7 @@ public class AbsenceServiceImpl implements AbsenceService {
 
     @Override
     public UserMessage cancelAbsenceRequest(String absenceRecordHash, User currentUser, Long organizationId) {
-        Long absenceRecordId = absenceRecordHashResolver.retrieveIdentifier(absenceRecordHash);
+        Long absenceRecordId = hashResolverFactory.retrieveIdentifier(absenceRecordHash);
 
         AbsenceRecord absenceRecord = findById(absenceRecordId);
         absenceRecord.setIsCancelled(true);
@@ -122,7 +118,7 @@ public class AbsenceServiceImpl implements AbsenceService {
 
     @Override
     public UserMessage getOrganizationAbsenceRequests(String organizationHash) {
-        Long organizationId = organizationHashResolver.retrieveIdentifier(organizationHash);
+        Long organizationId = hashResolverFactory.retrieveIdentifier(organizationHash);
         Organization organization = organizationService.findById(organizationId);
 
         List<AbsenceRecord> records = absenceRecordRepository.findAllByOrganization(organization);
@@ -140,7 +136,7 @@ public class AbsenceServiceImpl implements AbsenceService {
 
     @Override
     public UserMessage approveAbsenceRequest(String absenceRecordHash, User currentUser) {
-        Long absenceRecordId = absenceRecordHashResolver.retrieveIdentifier(absenceRecordHash);
+        Long absenceRecordId = hashResolverFactory.retrieveIdentifier(absenceRecordHash);
         AbsenceRecord absenceRecord = findById(absenceRecordId);
         absenceRecord.setIsApproved(true);
         AbsenceRecord updatedRecord = absenceRecordRepository.save(absenceRecord);
@@ -168,7 +164,6 @@ public class AbsenceServiceImpl implements AbsenceService {
             Date currentDate = new Date(time);
 
             if (isWeekend(currentDate)) {
-//                chart.increaseSectionShare("Weekend", (double) membersSize);
                 continue;
             }
 

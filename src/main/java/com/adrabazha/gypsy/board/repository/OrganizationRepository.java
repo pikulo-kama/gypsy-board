@@ -1,6 +1,7 @@
 package com.adrabazha.gypsy.board.repository;
 
 import com.adrabazha.gypsy.board.domain.sql.Organization;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -12,6 +13,8 @@ import java.util.List;
 public interface OrganizationRepository extends JpaRepository<Organization, Long> {
 
     Boolean existsByOrganizationName(@NotNull String organizationName);
+
+    List<Organization> findAllByOrganizationNameContains(@NotNull String organizationName, Pageable pageable);
 
     @Modifying
     @Query(value = "INSERT INTO USER_ORGANIZATION (user_id, organization_id, role_id, is_invitation_accepted) " +

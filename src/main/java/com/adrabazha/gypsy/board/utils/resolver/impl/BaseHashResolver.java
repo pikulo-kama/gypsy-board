@@ -1,10 +1,12 @@
-package com.adrabazha.gypsy.board.utils.resolver;
+package com.adrabazha.gypsy.board.utils.resolver.impl;
 
 import com.adrabazha.gypsy.board.exception.GeneralException;
+import com.adrabazha.gypsy.board.utils.resolver.QueryHashSet;
+import com.adrabazha.gypsy.board.utils.resolver.Resolver;
 
 import java.util.UUID;
 
-public class BaseHashResolver<T> {
+abstract class BaseHashResolver<T> {
 
     protected T retrieveIdentifier(String hash, QueryHashSet<T> hashSet) {
         if (hashSet.isEmpty() || !hashSet.containsHash(hash)) {
@@ -21,9 +23,12 @@ public class BaseHashResolver<T> {
         if (hashSet.containsIdentifier(identifier)) {
             hash = hashSet.findByIdentifier(identifier).getHash();
         } else {
-            hash = UUID.randomUUID().toString();
+            hash = String.format("%s-%s",
+                    getResolverType().getPrefix(), UUID.randomUUID().toString());
             hashSet.addHashEntry(identifier, hash);
         }
         return hash;
     }
+
+    public abstract Resolver getResolverType();
 }

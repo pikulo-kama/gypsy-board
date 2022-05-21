@@ -1,30 +1,31 @@
-package com.adrabazha.gypsy.board.mapper;
+package com.adrabazha.gypsy.board.utils.mapper;
 
 import com.adrabazha.gypsy.board.domain.nosql.OrganizationDocument;
 import com.adrabazha.gypsy.board.dto.response.DocumentReferenceResponse;
 import com.adrabazha.gypsy.board.dto.response.DocumentResponse;
-import com.adrabazha.gypsy.board.utils.resolver.DocumentHashResolver;
+import com.adrabazha.gypsy.board.utils.resolver.HashResolverFactory;
+import com.adrabazha.gypsy.board.utils.resolver.Resolver;
 import org.springframework.stereotype.Component;
 
 @Component
 public class DocumentMapper {
 
-    private final DocumentHashResolver documentHashResolver;
+    private final HashResolverFactory hashResolverFactory;
 
-    public DocumentMapper(DocumentHashResolver documentHashResolver) {
-        this.documentHashResolver = documentHashResolver;
+    public DocumentMapper(HashResolverFactory hashResolverFactory) {
+        this.hashResolverFactory = hashResolverFactory;
     }
 
     public DocumentReferenceResponse mapDocumentToReferenceResponse(OrganizationDocument document) {
         return DocumentReferenceResponse.builder()
-                .documentHash(documentHashResolver.obtainHash(document.getDocumentId()))
+                .documentHash(hashResolverFactory.obtainHash(document.getDocumentId(), Resolver.DOCUMENT))
                 .documentHeader(document.getDocumentHeader())
                 .build();
     }
 
     public DocumentResponse mapDocumentToResponse(OrganizationDocument document) {
         return DocumentResponse.builder()
-                .documentHash(documentHashResolver.obtainHash(document.getDocumentId()))
+                .documentHash(hashResolverFactory.obtainHash(document.getDocumentId(), Resolver.DOCUMENT))
                 .documentData(document.getDocumentData())
                 .documentHeader(document.getDocumentHeader())
                 .build();

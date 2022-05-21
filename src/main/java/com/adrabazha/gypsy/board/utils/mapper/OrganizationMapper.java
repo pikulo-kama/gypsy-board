@@ -1,11 +1,12 @@
-package com.adrabazha.gypsy.board.mapper;
+package com.adrabazha.gypsy.board.utils.mapper;
 
 import com.adrabazha.gypsy.board.domain.sql.Organization;
 import com.adrabazha.gypsy.board.dto.response.BoardReferenceResponse;
 import com.adrabazha.gypsy.board.dto.response.OrganizationReferenceResponse;
 import com.adrabazha.gypsy.board.dto.response.OrganizationResponse;
 import com.adrabazha.gypsy.board.dto.response.UserReferenceResponse;
-import com.adrabazha.gypsy.board.utils.resolver.OrganizationHashResolver;
+import com.adrabazha.gypsy.board.utils.resolver.HashResolverFactory;
+import com.adrabazha.gypsy.board.utils.resolver.Resolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,14 +18,14 @@ public class OrganizationMapper {
 
     private final BoardMapper boardMapper;
     private final UserMapper userMapper;
-    private final OrganizationHashResolver organizationHashResolver;
+    private final HashResolverFactory hashResolverFactory;
 
     @Autowired
     public OrganizationMapper(BoardMapper boardMapper, UserMapper userMapper,
-                              OrganizationHashResolver organizationHashResolver) {
+                              HashResolverFactory hashResolverFactory) {
         this.boardMapper = boardMapper;
         this.userMapper = userMapper;
-        this.organizationHashResolver = organizationHashResolver;
+        this.hashResolverFactory = hashResolverFactory;
     }
 
     public OrganizationResponse mapOrganizationToResponse(Organization organization) {
@@ -46,7 +47,7 @@ public class OrganizationMapper {
     public OrganizationReferenceResponse mapOrganizationsToReferenceResponse(Organization organization) {
         return OrganizationReferenceResponse.builder()
                 .organizationName(organization.getOrganizationName())
-                .organizationHash(organizationHashResolver.obtainHash(organization.getOrganizationId()))
+                .organizationHash(hashResolverFactory.obtainHash(organization.getOrganizationId(), Resolver.ORGANIZATION))
                 .build();
     }
 }

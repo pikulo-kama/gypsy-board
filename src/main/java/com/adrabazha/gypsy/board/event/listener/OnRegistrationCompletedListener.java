@@ -1,4 +1,4 @@
-package com.adrabazha.gypsy.board.listener;
+package com.adrabazha.gypsy.board.event.listener;
 
 import com.adrabazha.gypsy.board.dto.MailMessage;
 import com.adrabazha.gypsy.board.event.RegistrationCompletedEvent;

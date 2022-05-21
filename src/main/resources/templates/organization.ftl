@@ -2,6 +2,7 @@
 
 <#include "includes/modal/create_board.ftl">
 <#include "includes/modal/add_member.ftl">
+<#include "includes/modal/create_shared_board.ftl">
 
 <div class="position-absolute w-100 h-100 d-flex justify-content-start align-content-start ms-4">
     <div id="${organization.organizationHash}"
@@ -41,7 +42,11 @@
                         <ul id="board-data-list" class="data-list">
                             <#if organization.organizationBoards?size != 0>
                                 <#list organization.organizationBoards as board>
-                                    <li><a href="/boards?b=${board.boardHash}">${board.boardName}</a></li>
+                                    <#if board.isShared >
+                                        <li><a href="/boards?b=${board.boardHash}" class="shared-organization" style="color: #fff;">${board.boardName} <small class="text-muted">shared by ${board.ownerOrganization.organizationName}</small></a></li>
+                                    <#else >
+                                        <li><a href="/boards?b=${board.boardHash}">${board.boardName}</a></li>
+                                    </#if>
                                 </#list>
                             <#else >
                                 <li id="no-boards-list-item">No boards available</li>
@@ -93,7 +98,7 @@
 
 
         <div class="d-flex flex-column">
-            <div class="d-flex flex-row">
+            <div class="d-flex flex-row gap-2">
                 <button id="create-board-btn"
                         type="button"
                         class="btn btn-outline-dark btn-rounded"
@@ -101,6 +106,14 @@
                         data-mdb-toggle="modal"
                         data-mdb-target="#create-board-modal">
                     <i class="fas fa-clipboard-list fa-lg"></i> Create Board
+                </button>
+                <button id="create-shared-board-btn"
+                        type="button"
+                        class="btn btn-outline-dark btn-rounded"
+                        data-mdb-ripple-color="dark"
+                        data-mdb-toggle="modal"
+                        data-mdb-target="#create-shared-board-modal">
+                    <i class="fas fa-clipboard-list fa-lg"></i> Create Shared Board
                 </button>
                 <button id="add-members-btn"
                         type="button"
@@ -123,6 +136,7 @@
 <link rel="stylesheet" href="/css/dropdown.css">
 <link rel="stylesheet" href="/css/form.css">
 <link rel="stylesheet" href="/css/userimage.css">
+<link rel="stylesheet" href="/css/organization.css">
 <script type="text/javascript" src="/scripts/board.js"></script>
 <script type="text/javascript" src="/scripts/organization.js"></script>
 

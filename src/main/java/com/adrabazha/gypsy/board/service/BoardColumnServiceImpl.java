@@ -11,8 +11,8 @@ import com.adrabazha.gypsy.board.exception.GeneralException;
 import com.adrabazha.gypsy.board.repository.BoardColumnRepository;
 import com.adrabazha.gypsy.board.utils.mail.CustomEventPublisher;
 import com.adrabazha.gypsy.board.utils.mail.templates.MessageTemplates;
-import com.adrabazha.gypsy.board.utils.resolver.BoardColumnHashResolver;
-import com.adrabazha.gypsy.board.utils.resolver.BoardHashResolver;
+import com.adrabazha.gypsy.board.utils.resolver.HashResolverFactory;
+import com.adrabazha.gypsy.board.utils.resolver.Resolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,22 +22,19 @@ import java.util.Optional;
 @Service
 public class BoardColumnServiceImpl implements BoardColumnService {
 
+    private final HashResolverFactory hashResolverFactory;
     private final BoardService boardService;
-    private final BoardHashResolver boardHashResolver;
     private final BoardColumnRepository boardColumnRepository;
-    private final BoardColumnHashResolver boardColumnHashResolver;
     private final CustomEventPublisher eventPublisher;
 
     @Autowired
-    public BoardColumnServiceImpl(BoardService boardService,
-                                  BoardHashResolver boardHashResolver,
+    public BoardColumnServiceImpl(HashResolverFactory hashResolverFactory,
+                                  BoardService boardService,
                                   BoardColumnRepository boardColumnRepository,
-                                  BoardColumnHashResolver boardColumnHashResolver,
                                   CustomEventPublisher eventPublisher) {
+        this.hashResolverFactory = hashResolverFactory;
         this.boardService = boardService;
-        this.boardHashResolver = boardHashResolver;
         this.boardColumnRepository = boardColumnRepository;
-        this.boardColumnHashResolver = boardColumnHashResolver;
         this.eventPublisher = eventPublisher;
     }
 
@@ -49,7 +46,7 @@ public class BoardColumnServiceImpl implements BoardColumnService {
 
     @Override
     public void updateColumnName(ColumnUpdateForm columnUpdateForm, User currentUser) {
-        Long columnId = boardColumnHashResolver.retrieveIdentifier(columnUpdateForm.getColumnHash());
+        Long columnId = hashResolverFactory.retrieveIdentifier(columnUpdateForm.getColumnHash());
         BoardColumn boardColumn = findById(columnId);
         boardColumn.setColumnName(columnUpdateForm.getColumnName());
         BoardColumn updatedColumn = boardColumnRepository.save(boardColumn);
@@ -62,7 +59,7 @@ public class BoardColumnServiceImpl implements BoardColumnService {
 
     @Override
     public UserMessage createBoardColumn(ColumnCreateForm columnCreateForm, User currentUser) {
-        Long boardId = boardHashResolver.retrieveIdentifier(columnCreateForm.getBoardHash());
+        Long boardId = hashResolverFactory.retrieveIdentifier(columnCreateForm.getBoardHash());
         Board board = boardService.findById(boardId);
         Optional<BoardColumn> lastBoardColumn = board.getBoardColumns().stream()
                 .max(Comparator.comparingInt(BoardColumn::getColumnOrder));
@@ -86,7 +83,7 @@ public class BoardColumnServiceImpl implements BoardColumnService {
 
         UserMessage userMessage = UserMessage.success("Column was added");
         userMessage.addResponseDataEntry("boardColumn", BoardColumnReferenceResponse.builder()
-                .columnHash(boardColumnHashResolver.obtainHash(persistedBoardColumn.getColumnId()))
+                .columnHash(hashResolverFactory.obtainHash(persistedBoardColumn.getColumnId(), Resolver.BOARD_COLUMN))
                 .columnName(persistedBoardColumn.getColumnName())
                 .build());
         return userMessage;
@@ -94,7 +91,7 @@ public class BoardColumnServiceImpl implements BoardColumnService {
 
     @Override
     public UserMessage deleteBoardColumn(String columnHash) {
-        Long columnId = boardColumnHashResolver.retrieveIdentifier(columnHash);
+        Long columnId = hashResolverFactory.retrieveIdentifier(columnHash);
         boardColumnRepository.deleteById(columnId);
         return UserMessage.success("Column was removed");
     }
