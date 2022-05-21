@@ -71,9 +71,6 @@ $(document).on('click', '.add-task-btn', function () {
         let response = JSON.parse(request.responseText);
         let taskName = String(response['taskName']);
         let taskHash = response['taskHash'];
-        // if (taskName.length > 22) {
-        //     taskName = taskName.substring(0, 22) + '...';
-        // }
         boardColumnList.append(getTaskHtml(taskHash, trimTaskName(taskName)));
         taskField.val('');
     }
@@ -138,10 +135,8 @@ function handleRemoveTaskBtnClick(taskHash) {
 function trimTaskName(taskName) {
     let maxLength = 22;
 
-    if (taskName.split(' ').length === 1 && taskName.length > maxLength) {
-        return taskName.substring(0, 22) + '...';
+    if (taskName.length > maxLength) {
+        return taskName.substring(0, maxLength - 3) + '...';
     }
-
-    let trimmedString = taskName.substr(0, maxLength);
-    return trimmedString.substr(0, Math.min(trimmedString.length, trimmedString.lastIndexOf(" "))) + ' ...';
+    return taskName;
 }

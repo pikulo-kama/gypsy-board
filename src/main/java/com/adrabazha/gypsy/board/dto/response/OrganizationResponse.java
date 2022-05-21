@@ -20,4 +20,8 @@ public class OrganizationResponse {
     private List<UserReferenceResponse> organizationMembers;
 
     private List<BoardReferenceResponse> organizationBoards;
+
+    public void addOrganizationBoards(List<BoardReferenceResponse> boardReferences) {
+        organizationBoards.addAll(boardReferences);
+    }
 }

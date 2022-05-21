@@ -8,12 +8,12 @@ import com.adrabazha.gypsy.board.dto.form.TaskCreateForm;
 import com.adrabazha.gypsy.board.dto.form.TaskUpdateForm;
 import com.adrabazha.gypsy.board.dto.response.TaskReferenceResponse;
 import com.adrabazha.gypsy.board.dto.response.TaskResponse;
+import com.adrabazha.gypsy.board.exception.GeneralException;
 import com.adrabazha.gypsy.board.utils.mapper.TaskMapper;
 import com.adrabazha.gypsy.board.repository.TaskRepository;
 import com.adrabazha.gypsy.board.utils.mail.CustomEventPublisher;
 import com.adrabazha.gypsy.board.utils.mail.templates.MessageTemplates;
-import com.adrabazha.gypsy.board.utils.resolver.BoardColumnHashResolver;
-import com.adrabazha.gypsy.board.utils.resolver.TaskHashResolver;
+import com.adrabazha.gypsy.board.utils.resolver.HashResolverFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,8 +30,7 @@ public class TaskServiceImpl implements TaskService {
 
     private static final String INITIAL_TASK_DESCRIPTION = "{\"ops\":[{\"insert\":\"\\n\"}]}";
 
-    private final BoardColumnHashResolver boardColumnHashResolver;
-    private final TaskHashResolver taskHashResolver;
+    private final HashResolverFactory hashResolverFactory;
     private final BoardColumnService boardColumnService;
     private final TaskRepository taskRepository;
     private final TaskMapper taskMapper;
@@ -39,15 +38,13 @@ public class TaskServiceImpl implements TaskService {
     private final CustomEventPublisher eventPublisher;
 
     @Autowired
-    public TaskServiceImpl(BoardColumnHashResolver boardColumnHashResolver,
-                           TaskHashResolver taskHashResolver,
+    public TaskServiceImpl(HashResolverFactory hashResolverFactory,
                            BoardColumnService boardColumnService,
                            TaskRepository taskRepository,
                            TaskMapper taskMapper,
                            UserService userService,
                            CustomEventPublisher eventPublisher) {
-        this.boardColumnHashResolver = boardColumnHashResolver;
-        this.taskHashResolver = taskHashResolver;
+        this.hashResolverFactory = hashResolverFactory;
         this.boardColumnService = boardColumnService;
         this.taskRepository = taskRepository;
         this.taskMapper = taskMapper;
@@ -56,7 +53,8 @@ public class TaskServiceImpl implements TaskService {
     }
 
     private Task findById(Long taskId) {
-        return taskRepository.
+        return taskRepository.findById(taskId)
+                .orElseThrow(() -> new GeneralException("Task not found"));
     }
 
     @Override
@@ -67,7 +65,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public TaskReferenceResponse createTask(TaskCreateForm taskForm, User currentUser) {
-        Long columnId = boardColumnHashResolver.retrieveIdentifier(taskForm.getColumnHash());
+        Long columnId = hashResolverFactory.retrieveIdentifier(taskForm.getColumnHash());
         BoardColumn boardColumn = boardColumnService.findById(columnId);
         Integer taskOrder = getNextPosition(boardColumn);
 
@@ -89,7 +87,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public void updateTask(TaskUpdateForm taskUpdateForm, User currentUser) {
-        Long taskId = taskHashResolver.retrieveIdentifier(taskUpdateForm.getTaskHash());
+        Long taskId = hashResolverFactory.retrieveIdentifier(taskUpdateForm.getTaskHash());
 
         Task task = findById(taskId);
         Task.TaskBuilder taskBuilder = task.toBuilder()
@@ -111,16 +109,16 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public void synchronizeTasks(ColumnSynchronizationForm columnSynchronizationForm) {
-        Long currentColumnId = boardColumnHashResolver.retrieveIdentifier(columnSynchronizationForm.getSourceColumnHash());
+        Long currentColumnId = hashResolverFactory.retrieveIdentifier(columnSynchronizationForm.getSourceColumnHash());
         BoardColumn currentColumn = boardColumnService.findById(currentColumnId);
 
-        Long foreignColumnId = boardColumnHashResolver.retrieveIdentifier(columnSynchronizationForm.getTargetColumnHash());
+        Long foreignColumnId = hashResolverFactory.retrieveIdentifier(columnSynchronizationForm.getTargetColumnHash());
         BoardColumn foreignColumn = boardColumnService.findById(foreignColumnId);
 
         List<Task> persistedTasks = currentColumn.getTasks();
 
         List<Long> taskIdList = columnSynchronizationForm.getTaskHashList().stream()
-                .map(taskHashResolver::retrieveIdentifier)
+                .map(hashResolverFactory::retrieveIdentifier)
                 .collect(Collectors.toList());
         Map<Long, Integer> prioritizeTaskIdList = prioritizeTaskIdList(taskIdList);
 

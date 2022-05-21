@@ -1,5 +1,7 @@
-package com.adrabazha.gypsy.board.utils.resolver;
+package com.adrabazha.gypsy.board.utils.resolver.impl;
 
+import com.adrabazha.gypsy.board.utils.resolver.QueryHashSet;
+import com.adrabazha.gypsy.board.utils.resolver.Resolver;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
@@ -17,5 +19,10 @@ public class DocumentHashResolverImpl extends BaseHashResolver<Long> implements 
     @Override
     public String obtainHash(Long identifier) {
         return super.obtainHash(identifier, documentHashSet);
+    }
+
+    @Override
+    public Resolver getResolverType() {
+        return Resolver.DOCUMENT;
     }
 }

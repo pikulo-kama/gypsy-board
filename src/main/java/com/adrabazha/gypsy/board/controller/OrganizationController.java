@@ -6,7 +6,7 @@ import com.adrabazha.gypsy.board.dto.response.OrganizationResponse;
 import com.adrabazha.gypsy.board.service.OrganizationService;
 import com.adrabazha.gypsy.board.service.SessionService;
 import com.adrabazha.gypsy.board.token.service.MembershipTokenService;
-import com.adrabazha.gypsy.board.utils.resolver.OrganizationHashResolver;
+import com.adrabazha.gypsy.board.utils.resolver.HashResolverFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -22,17 +22,17 @@ import javax.servlet.http.HttpServletRequest;
 public class OrganizationController {
 
     private final OrganizationService organizationService;
-    private final OrganizationHashResolver organizationHashResolver;
+    private final HashResolverFactory hashResolverFactory;
     private final SessionService sessionService;
     private final MembershipTokenService membershipTokenService;
 
     @Autowired
     public OrganizationController(OrganizationService organizationService,
-                                  OrganizationHashResolver organizationHashResolver,
+                                  HashResolverFactory hashResolverFactory,
                                   SessionService sessionService,
                                   MembershipTokenService membershipTokenService) {
         this.organizationService = organizationService;
-        this.organizationHashResolver = organizationHashResolver;
+        this.hashResolverFactory = hashResolverFactory;
         this.sessionService = sessionService;
         this.membershipTokenService = membershipTokenService;
     }
@@ -42,7 +42,7 @@ public class OrganizationController {
                                   @RequestParam("o") String organizationHash,
                                   HttpServletRequest request,
                                   Model model) {
-        Long organizationId = organizationHashResolver.retrieveIdentifier(organizationHash);
+        Long organizationId = hashResolverFactory.retrieveIdentifier(organizationHash);
         OrganizationResponse organization = organizationService.getOrganizationResponseDto(organizationId, currentUser);
         organization.setOrganizationHash(organizationHash);
         sessionService.setUserActiveOrganization(organizationHash, organizationId, request);
@@ -68,5 +68,4 @@ public class OrganizationController {
         Boolean isValid = membershipTokenService.validate(token);
         return "redirect:" + (isValid ? "/login" : "/error");
     }
-
 }

@@ -8,8 +8,11 @@ import com.adrabazha.gypsy.board.dto.form.OrganizationForm;
 import com.adrabazha.gypsy.board.dto.form.OrganizationMemberForm;
 import com.adrabazha.gypsy.board.dto.form.OrganizationMembersForm;
 import com.adrabazha.gypsy.board.dto.form.UpdateMemberRoleForm;
+import com.adrabazha.gypsy.board.dto.response.OrganizationReferenceResponse;
+import com.adrabazha.gypsy.board.dto.response.UserResponse;
 import com.adrabazha.gypsy.board.service.OrganizationService;
 import com.adrabazha.gypsy.board.service.SessionService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
@@ -21,6 +24,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.adrabazha.gypsy.board.domain.Role.ADMIN;
 import static com.adrabazha.gypsy.board.domain.Role.ASSISTANT;
@@ -83,5 +89,16 @@ public class OrganizationRestController {
                                                 @AuthenticationPrincipal User currentUser) {
         OrganizationToken token = sessionService.getUserActiveOrganization(request);
         return organizationService.removeOrganizationMember(form, token.getOrganizationId(), currentUser);
+    }
+
+    @GetMapping("/lookup")
+    public List<OrganizationReferenceResponse> getOrganizationsByInput(@RequestParam("input") String input,
+                                                                       HttpServletRequest request) {
+        List<OrganizationReferenceResponse> organizations = organizationService.getAllByInput(input);
+        OrganizationToken token = sessionService.getUserActiveOrganization(request);
+        organizations.removeIf(organizationReference ->
+                organizationReference.getOrganizationHash().equals(token.getOrganizationHash()));
+
+        return organizations;
     }
 }

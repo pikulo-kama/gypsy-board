@@ -6,6 +6,7 @@ import com.adrabazha.gypsy.board.dto.OrganizationToken;
 import com.adrabazha.gypsy.board.dto.UserMessage;
 import com.adrabazha.gypsy.board.dto.form.BoardCreateForm;
 import com.adrabazha.gypsy.board.dto.form.BoardUpdateForm;
+import com.adrabazha.gypsy.board.dto.form.SharedBoardCreateForm;
 import com.adrabazha.gypsy.board.service.BoardService;
 import com.adrabazha.gypsy.board.service.SessionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,13 +42,22 @@ public class BoardRestController {
                                    HttpServletRequest request,
                                    @AuthenticationPrincipal User currentUser) {
         OrganizationToken token = sessionService.getUserActiveOrganization(request);
-        return boardService.createBoard(boardCreateForm, token, currentUser);
+        return boardService.createBoard(boardCreateForm, token.getOrganizationId(), currentUser);
+    }
+
+    @OrganizationAccess({ADMIN, ASSISTANT})
+    @PostMapping("/shared/create")
+    public UserMessage createSharedBoard(@Validated @RequestBody SharedBoardCreateForm sharedBoardCreateForm,
+                                         HttpServletRequest request,
+                                         @AuthenticationPrincipal User currentUser) {
+        OrganizationToken token = sessionService.getUserActiveOrganization(request);
+        return boardService.createSharedBoard(sharedBoardCreateForm, token.getOrganizationId(), currentUser);
     }
 
     @OrganizationAccess({ADMIN, ASSISTANT})
     @PostMapping("/update")
-    public UserMessage updateBoard(@Validated @RequestBody BoardUpdateForm boardUpdateForm,
-                                   @AuthenticationPrincipal User currentUser) {
+    public UserMessage updateBoardName(@Validated @RequestBody BoardUpdateForm boardUpdateForm,
+                                       @AuthenticationPrincipal User currentUser) {
         return boardService.updateBoard(boardUpdateForm, currentUser);
     }
 

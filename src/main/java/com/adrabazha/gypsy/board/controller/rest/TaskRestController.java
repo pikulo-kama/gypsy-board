@@ -7,7 +7,7 @@ import com.adrabazha.gypsy.board.dto.form.TaskUpdateForm;
 import com.adrabazha.gypsy.board.dto.response.TaskReferenceResponse;
 import com.adrabazha.gypsy.board.dto.response.TaskResponse;
 import com.adrabazha.gypsy.board.service.TaskService;
-import com.adrabazha.gypsy.board.utils.resolver.TaskHashResolver;
+import com.adrabazha.gypsy.board.utils.resolver.HashResolverFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,23 +24,23 @@ import javax.validation.Valid;
 public class TaskRestController {
 
     private final TaskService taskService;
-    private final TaskHashResolver taskHashResolver;
+    private final HashResolverFactory hashResolverFactory;
 
     @Autowired
-    public TaskRestController(TaskService taskService, TaskHashResolver taskHashResolver) {
+    public TaskRestController(TaskService taskService, HashResolverFactory hashResolverFactory) {
         this.taskService = taskService;
-        this.taskHashResolver = taskHashResolver;
+        this.hashResolverFactory = hashResolverFactory;
     }
 
     @GetMapping
     public TaskResponse getTask(@RequestParam("t") String taskHash) {
-        Long taskId = taskHashResolver.retrieveIdentifier(taskHash);
+        Long taskId = hashResolverFactory.retrieveIdentifier(taskHash);
         return taskService.getTask(taskId);
     }
 
     @PostMapping("/delete")
     public void deleteTask(@RequestParam("t") String taskHash) {
-        Long taskId = taskHashResolver.retrieveIdentifier(taskHash);
+        Long taskId = hashResolverFactory.retrieveIdentifier(taskHash);
         taskService.deleteTask(taskId);
     }
 

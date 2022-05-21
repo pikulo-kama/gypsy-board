@@ -34,6 +34,12 @@ public class Board {
     @JoinColumn(name = "organization_id")
     private Organization organization;
 
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(name = "shared_boards",
+            joinColumns = @JoinColumn(name = "board_id", referencedColumnName = "board_id"),
+            inverseJoinColumns = @JoinColumn(name = "organization_id", referencedColumnName = "organization_id"))
+    private List<Organization> collaborators;
+
     @OneToMany(mappedBy = "board", fetch = FetchType.LAZY)
     @ToString.Exclude
     private List<BoardColumn> boardColumns;

@@ -5,7 +5,8 @@ import com.adrabazha.gypsy.board.domain.sql.BoardColumn;
 import com.adrabazha.gypsy.board.dto.response.BoardColumnResponse;
 import com.adrabazha.gypsy.board.dto.response.BoardReferenceResponse;
 import com.adrabazha.gypsy.board.dto.response.BoardResponse;
-import com.adrabazha.gypsy.board.utils.resolver.BoardHashResolver;
+import com.adrabazha.gypsy.board.utils.resolver.HashResolverFactory;
+import com.adrabazha.gypsy.board.utils.resolver.Resolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -16,12 +17,13 @@ import java.util.stream.Collectors;
 @Component
 public class BoardMapper {
 
-    private final BoardHashResolver boardHashResolver;
+    private final HashResolverFactory hashResolverFactory;
     private final BoardColumnMapper boardColumnMapper;
 
     @Autowired
-    public BoardMapper(BoardHashResolver boardHashResolver, BoardColumnMapper boardColumnMapper) {
-        this.boardHashResolver = boardHashResolver;
+    public BoardMapper(HashResolverFactory hashResolverFactory,
+                       BoardColumnMapper boardColumnMapper) {
+        this.hashResolverFactory = hashResolverFactory;
         this.boardColumnMapper = boardColumnMapper;
     }
 
@@ -40,7 +42,9 @@ public class BoardMapper {
     public BoardReferenceResponse mapBoardToReferenceResponse(Board board) {
         return BoardReferenceResponse.builder()
                 .boardName(board.getBoardName())
-                .boardHash(boardHashResolver.obtainHash(board.getId()))
+                .boardHash(hashResolverFactory.obtainHash(board.getId(), Resolver.BOARD))
+                .isShared(false)
+                .ownerOrganization(null)
                 .build();
     }
 }
