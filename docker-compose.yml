@@ -1,0 +1,60 @@
+version: '3'
+
+services:
+  app:
+    build:
+      context: .
+    container_name: gypsy-board-application
+    ports:
+      - '${GYPSY_BOARD_BACKEND_PORT}:8000'
+    environment:
+        GYPSY_BOARD_POSTGRES_URL: ${GYPSY_BOARD_POSTGRES_URL}
+        GYPSY_BOARD_POSTGRES_USER: ${GYPSY_BOARD_POSTGRES_USER}
+        GYPSY_BOARD_POSTGRES_PASS: ${GYPSY_BOARD_POSTGRES_PASS}
+        GYPSY_BOARD_MONGO_URL: ${GYPSY_BOARD_MONGO_URL}
+        GYPSY_BOARD_MAIL_HOST: ${GYPSY_BOARD_MAIL_HOST}
+        GYPSY_BOARD_MAIL_PORT: ${GYPSY_BOARD_MAIL_PORT}
+        GYPSY_BOARD_MAIL_USERNAME: ${GYPSY_BOARD_MAIL_USERNAME}
+        GYPSY_BOARD_MAIL_PASSWORD: ${GYPSY_BOARD_MAIL_PASSWORD}
+        GYPSY_BOARD_MAIL_PROTOCOL: ${GYPSY_BOARD_MAIL_PROTOCOL}
+        GYPSY_BOARD_TOKEN_LIFETIME: ${GYPSY_BOARD_TOKEN_LIFETIME}
+    depends_on:
+      - mongo
+      - postgres
+    networks:
+      - gypsy-board
+
+  postgres:
+    image: 'postgres:13.1-alpine'
+    container_name: gypsy-board-postgres-database
+    restart: always
+    volumes:
+      - gypsy-board-postgres-data:/var/lib/postgresql/data
+    ports:
+      - '${GYPSY_BOARD_POSTGRES_PORT}:5432'
+    environment:
+      POSTGRES_DB: ${GYPSY_BOARD_POSTGRES_DB}
+      POSTGRES_USER: ${GYPSY_BOARD_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${GYPSY_BOARD_POSTGRES_PASS}
+    networks:
+      - gypsy-board
+
+  mongo:
+    image: 'mongo:4.4.14-focal'
+    container_name: gypsy-board-mongo-database
+    restart: always
+    volumes:
+      - gypsy-board-mongo-data:/data/db
+    ports:
+      - '${GYPSY_BOARD_MONGO_PORT}:27017'
+    environment:
+      MONGO_INITDB_DATABASE: ${GYPSY_BOARD_MONGO_DB_NAME}
+    networks:
+      - gypsy-board
+
+volumes:
+  gypsy-board-postgres-data:
+    driver: local
+  gypsy-board-mongo-data:
+networks:
+  gypsy-board:
