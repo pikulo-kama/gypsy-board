@@ -1,11 +1,11 @@
 spring:
   datasource:
-    url: ${GYPSY_BOARD_POSTGRES_URL:jdbc:postgresql://localhost:5435/gypsyboard}
-    username: ${GYPSY_BOARD_POSTGRES_USER:admin}
-    password: ${GYPSY_BOARD_POSTGRES_PASS:admin}
+    url: ${GYPSY_BOARD_POSTGRES_URL}
+    username: ${GYPSY_BOARD_POSTGRES_USER}
+    password: ${GYPSY_BOARD_POSTGRES_PASS}
   data:
     mongodb:
-      uri: ${GYPSY_BOARD_MONGO_URL:mongodb://localhost:27017/gypsy-board-mongo}
+      uri: ${GYPSY_BOARD_MONGO_URL}
 
   freemarker:
     suffix: .ftl
@@ -16,11 +16,11 @@ spring:
   cache:
     type: "none"
   mail:
-    host: smtp.gmail.com
-    port: 587
-    username: noreply.gypsy.board@gmail.com
-    password: H@ck3r00
-    protocol: smtp
+    host: ${GYPSY_BOARD_MAIL_HOST}
+    port: ${GYPSY_BOARD_MAIL_PORT}
+    username: ${GYPSY_BOARD_MAIL_USERNAME}
+    password: ${GYPSY_BOARD_MAIL_PASSWORD}
+    protocol: ${GYPSY_BOARD_MAIL_PROTOCOL}
     properties.mail.smtp:
       auth: true
       starttls.enable: true
@@ -28,6 +28,4 @@ spring:
 server:
   port: 8000
 
-application:
-  token:
-    lifetime: 24
+application.token.lifetime: ${GYPSY_BOARD_TOKEN_LIFETIME} # in hours
